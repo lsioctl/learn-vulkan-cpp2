@@ -27,4 +27,15 @@ void createGraphicsPipeline(
     VkPipeline& graphicsPipeline
 );
 
+void createCubePipeline(
+    const char* vert_file,
+    const char* frag_file,
+    VkDevice logical_device,
+    VkExtent2D swapChainExtent,
+    VkSampleCountFlagBits msaaSampleCount,
+    VkRenderPass renderPass,
+    VkPipelineLayout& pipelineLayout,
+    VkPipeline& graphicsPipeline
+);
+
 }
