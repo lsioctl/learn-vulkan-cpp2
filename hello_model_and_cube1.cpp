@@ -626,16 +626,16 @@ private:
         // no secondary command buffer so no VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
         vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-        // vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline_);
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline_);
 
-        // VkBuffer vertexBuffers[] = {vertexBuffer_};
-        // VkDeviceSize offsets[] = {0};
-        // vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+        VkBuffer vertexBuffers[] = {vertexBuffer_};
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-        // // we can have only one index buffer
-        // // we used a 32 bit for storage for the indices
-        // // so 32 bit storage for the index buffer
-        // vkCmdBindIndexBuffer(commandBuffer, indexBuffer_, 0, VK_INDEX_TYPE_UINT32);
+        // we can have only one index buffer
+        // we used a 32 bit for storage for the indices
+        // so 32 bit storage for the index buffer
+        vkCmdBindIndexBuffer(commandBuffer, indexBuffer_, 0, VK_INDEX_TYPE_UINT32);
 
         // as we defined viewport and scissor state to be dynamic
         // we need to set them in the command buffer before the draw command
@@ -653,30 +653,30 @@ private:
         scissor.extent = swapChainExtent_;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-        // vkCmdBindDescriptorSets(
-        //     commandBuffer,
-        //     VK_PIPELINE_BIND_POINT_GRAPHICS,
-        //     pipelineLayout_,
-        //     0,
-        //     1,
-        //     &descriptorSets_[currentFrame_],
-        //     0,
-        //     nullptr
-        // );
+        vkCmdBindDescriptorSets(
+            commandBuffer,
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            pipelineLayout_,
+            0,
+            1,
+            &descriptorSets_[currentFrame_],
+            0,
+            nullptr
+        );
 
-        // vkCmdDrawIndexed(
-        //     commandBuffer,
-        //     // now index count instead of vertex count as we draw indexed
-        //     static_cast<uint32_t>(indices_.size()),
-        //     // instanceCount: Used for instanced rendering, use 1 if you're not doing that.
-        //     1,
-        //     // first index
-        //     0,
-        //     // offset to add to the indices in the index buffer
-        //     0,
-        //     // firstInstance, we don't use instance.
-        //     0 
-        // );
+        vkCmdDrawIndexed(
+            commandBuffer,
+            // now index count instead of vertex count as we draw indexed
+            static_cast<uint32_t>(indices_.size()),
+            // instanceCount: Used for instanced rendering, use 1 if you're not doing that.
+            1,
+            // first index
+            0,
+            // offset to add to the indices in the index buffer
+            0,
+            // firstInstance, we don't use instance.
+            0 
+        );
 
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cubePipeline_);
 
