@@ -128,3 +128,31 @@ std::unique_ptr<GLFWwindow, DestroyglfwWin> window_;
 // somehere in a init window function
 window_ = std::unique_ptr<GLFWwindow, DestroyglfwWin>(glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr));
 ```
+
+### Qt
+
+* Simple Window class: https://doc.qt.io/qt-6/qvulkanwindow.html
+* default renderpass
+* more advanced example: https://doc.qt.io/qt-6/qtgui-hellovulkancubes-example.html
+
+> QVulkanWindow is a Vulkan-capable QWindow that manages a Vulkan device, a graphics queue, a command pool and buffer, a depth-stencil image and a double-buffered FIFO swapchain, while taking care of correct behavior when it comes to events like resize, special situations like not having a device queue supporting both graphics and presentation, device lost scenarios, and additional functionality like reading the rendered content back. Conceptually it is the counterpart of QOpenGLWindow in the Vulkan world.
+
+Note: QVulkanWindow does not always eliminate the need to implement a fully custom QWindow subclass as it will not necessarily be sufficient in advanced use cases.
+
+
+https://doc.qt.io/qt-6/qwindow.html
+
+
+### Dynamic rendering vs render passes
+
+Since Vulkan ~1.3 we can use Dynamic rendering instead of render passes.
+
+https://docs.vulkan.org/samples/latest/samples/extensions/dynamic_rendering/README.html
+
+current vulkan guide uses it:
+
+https://vkguide.dev/
+
+Legacy one uses render passes
+
+https://vkguide.dev/docs/old_vkguide/
