@@ -349,10 +349,6 @@ void createGraphicsPipeline(
     multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
     multisampling.alphaToOneEnable = VK_FALSE; // Optional
 
-    // Depth/Stencil buffer
-    // We do have it right now so pass nullptr instead of a struct
-    // for VkPipelineDepthStencilStateCreateInfo
-
 
     /**
      * After a fragment shader has returned a color, 
@@ -610,11 +606,6 @@ void createCubePipeline(
     multisampling.pSampleMask = nullptr; // Optional
     multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
     multisampling.alphaToOneEnable = VK_FALSE; // Optional
-
-    // Depth/Stencil buffer
-    // We do have it right now so pass nullptr instead of a struct
-    // for VkPipelineDepthStencilStateCreateInfo
-
 
     /**
      * After a fragment shader has returned a color, 
