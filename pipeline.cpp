@@ -250,27 +250,27 @@ void createGraphicsPipeline(
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    // describes the region of the framebuffer that the output will be rendered to
-    // This is almost always (0, 0) to (width, height)
-    // size of the swap chain and its images may differ from the WIDTH and HEIGHT 
-    // of the window. The swap chain images will be used as framebuffers later on,
-    //  so we should stick to their size.
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float) swapChainExtent.width;
-    viewport.height = (float) swapChainExtent.height;
-    // specify the range of depth values to use for the framebuffer. 
-    // values must be within the [0.0f, 1.0f] range, 
-    // but minDepth may be higher than maxDepth
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
+    // // describes the region of the framebuffer that the output will be rendered to
+    // // This is almost always (0, 0) to (width, height)
+    // // size of the swap chain and its images may differ from the WIDTH and HEIGHT 
+    // // of the window. The swap chain images will be used as framebuffers later on,
+    // //  so we should stick to their size.
+    // VkViewport viewport{};
+    // viewport.x = 0.0f;
+    // viewport.y = 0.0f;
+    // viewport.width = (float) swapChainExtent.width;
+    // viewport.height = (float) swapChainExtent.height;
+    // // specify the range of depth values to use for the framebuffer. 
+    // // values must be within the [0.0f, 1.0f] range, 
+    // // but minDepth may be higher than maxDepth
+    // viewport.minDepth = 0.0f;
+    // viewport.maxDepth = 1.0f;
 
-    // to draw to the entire framebuffer, we would specify a scissor rectangle that covers
-    // it entirely:
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = swapChainExtent;
+    // // to draw to the entire framebuffer, we would specify a scissor rectangle that covers
+    // // it entirely:
+    // VkRect2D scissor{};
+    // scissor.offset = {0, 0};
+    // scissor.extent = swapChainExtent;
 
 
     // Very little amount of state can be changed on the pipeline which is mostly immutable
@@ -513,29 +513,6 @@ void createCubePipeline(
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    // describes the region of the framebuffer that the output will be rendered to
-    // This is almost always (0, 0) to (width, height)
-    // size of the swap chain and its images may differ from the WIDTH and HEIGHT 
-    // of the window. The swap chain images will be used as framebuffers later on,
-    //  so we should stick to their size.
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float) swapChainExtent.width;
-    viewport.height = (float) swapChainExtent.height;
-    // specify the range of depth values to use for the framebuffer. 
-    // values must be within the [0.0f, 1.0f] range, 
-    // but minDepth may be higher than maxDepth
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-
-    // to draw to the entire framebuffer, we would specify a scissor rectangle that covers
-    // it entirely:
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = swapChainExtent;
-
-
     // Very little amount of state can be changed on the pipeline which is mostly immutable
     // viewport and scissor can be dynamic without performance penalty
     // viewport and scissor rectangle will have to be set up at drawing time
@@ -554,6 +531,28 @@ void createCubePipeline(
     viewportState.viewportCount = 1;
     viewportState.scissorCount = 1;
 
+
+    // // describes the region of the framebuffer that the output will be rendered to
+    // // This is almost always (0, 0) to (width, height)
+    // // size of the swap chain and its images may differ from the WIDTH and HEIGHT 
+    // // of the window. The swap chain images will be used as framebuffers later on,
+    // //  so we should stick to their size.
+    // VkViewport viewport{};
+    // viewport.x = 0.0f;
+    // viewport.y = 0.0f;
+    // viewport.width = (float) swapChainExtent.width;
+    // viewport.height = (float) swapChainExtent.height;
+    // // specify the range of depth values to use for the framebuffer. 
+    // // values must be within the [0.0f, 1.0f] range, 
+    // // but minDepth may be higher than maxDepth
+    // viewport.minDepth = 0.0f;
+    // viewport.maxDepth = 1.0f;
+
+    // // to draw to the entire framebuffer, we would specify a scissor rectangle that covers
+    // // it entirely:
+    // VkRect2D scissor{};
+    // scissor.offset = {0, 0};
+    // scissor.extent = swapChainExtent;
 
     // if we want viewport ans scissor also immutable this could be done instead
     // some GPU could still have multiple so the struct reference an array of them
