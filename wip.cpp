@@ -1,16 +1,12 @@
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
 #include <vector>
 #include <cstring>
-#include <map>
 #include <optional>
-#include <set>
-#include <cstdint> // Necessary for uint32_t
-#include <fstream>
-#include <chrono>
+#include <cstdint>
 #include <memory>
-#include <unordered_map>
 #include <vulkan/vulkan_core.h>
 
 // Let GLFW include by itslef vulkan headers
@@ -20,10 +16,10 @@
 // use the OpenGL depth range of -1.0 to 1.0 by default. 
 // We need to configure it to use the Vulkan range of 0.0 to 1.0
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-// to easily print glm vec
-#include "glm/gtx/string_cast.hpp"
+#include "glm/glm.hpp" // IWYU pragma: keep
+#include "glm/gtc/matrix_transform.hpp" // IWYU pragma: keep
+// // to easily print glm vec
+// #include "glm/gtx/string_cast.hpp"
 // could be only in one file in the project
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -201,6 +197,33 @@ private:
     VkImage colorImage_;
     VkDeviceMemory colorImageMemory_;
     VkImageView colorImageView_;
+    // prepare the bounding box
+    float min_x_{};
+    float min_y_{};
+    float min_z_{};
+    float max_x_{};
+    float max_y_{};
+    float max_z_{};
+    float scaling_{1.};
+
+    void setScaling() {
+        std::cout << "Bounding box: " << std::endl;
+        std::cout << "Min x: " << min_x_ << std::endl; 
+        std::cout << "Min y: " << min_y_ << std::endl; 
+        std::cout << "Min z: " << min_z_ << std::endl; 
+        std::cout << "Max x: " << max_x_ << std::endl; 
+        std::cout << "Max y: " << max_y_ << std::endl; 
+        std::cout << "Max z: " << max_z_ << std::endl;
+
+        const auto span_x = max_x_ - min_x_;
+        const auto span_y = max_y_ - min_y_;
+        const auto span_z = max_z_ - min_z_;
+
+        const auto max_1 = fmax(span_x, span_y);
+        const auto max_span = fmax(max_1, span_z);
+
+        if (max_span > 1) scaling_ = 1. / max_span;
+    }
 
     void createSurface() {
         // if the surface object is platform agnostic, its creation is not
@@ -354,6 +377,7 @@ private:
             throw std::runtime_error(warn + err);
         }
 
+        
         // We're going to combine all of the faces in the file into a single model, so just iterate over all of the shapes:
         for (const auto& shape : shapes) {
             // The triangulation feature has already made sure that there are three vertices per face,
@@ -361,12 +385,28 @@ private:
             for (const auto& index : shape.mesh.indices) {
                 vertex::Vertex vertex{};
 
-                // attrib.vertices array is an array of float values instead of something like glm::vec3
-                vertex.pos = {
-                    attrib.vertices[3 * index.vertex_index + 0], // x
-                    attrib.vertices[3 * index.vertex_index + 1], // y
-                    attrib.vertices[3 * index.vertex_index + 2] // z
-                };
+                 // attrib.vertices array is an array of float values instead of something like glm::vec3
+                const auto vertex_x = attrib.vertices[3 * index.vertex_index + 0];
+                const auto vertex_y = attrib.vertices[3 * index.vertex_index + 1];
+                const auto vertex_z = attrib.vertices[3 * index.vertex_index + 2];
+
+                if (std::isnan(vertex_y)) {
+                    std::cout << "Heeeeeeeeeeeeeeere: " << vertex_y << std::endl;
+                }
+
+                
+               
+                vertex.pos = {vertex_x, vertex_y, vertex_z};
+
+                // update the bounding box, quick'n dirty way
+                if (vertex_x < min_x_) min_x_ = vertex_x;
+                if (vertex_y < min_y_) min_y_ = vertex_y;
+                if (vertex_z < min_z_) min_z_ = vertex_z;
+
+                if (vertex_x > max_x_) max_x_ = vertex_x;
+                if (vertex_y > max_y_) max_y_ = vertex_y;
+                if (vertex_z > max_z_) max_z_ = vertex_z;
+
 
                 // Similarly, there are two texture coordinate components per entry.
                 // Texture coordinates (if available)
@@ -747,6 +787,7 @@ private:
         // be wary we have an inversion on y axis (see later on the projection matrix)
         auto position = glm::vec3(0.0f,  0.5f, 0.0f);
         ubo.model = glm::translate(cube_model_matrix, position);
+        ubo.model = glm::scale(ubo.model, glm::vec3(scaling_));
         // ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         // ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
@@ -978,6 +1019,7 @@ private:
         pickPhysicalDeviceAndSetMSAASampleCount();
         createLogicalDevice();
         loadModel();
+        setScaling();
         createSwapChain();
         createImageViews();
         createColorResources();
