@@ -262,8 +262,10 @@ private:
     }
 
     static void mouseCallback(GLFWwindow* window, double x_pos, double y_pos) {
-        auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
-        app->camera_.updateOrientation(x_pos, y_pos);
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+            auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            app->camera_.updateOrientation(x_pos, y_pos);
+        }
     }
 
 
