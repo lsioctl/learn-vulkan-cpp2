@@ -58,10 +58,10 @@ const std::vector<const char*> DEVICE_EXTENSIONS = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-const auto VERT_FILE = "./shaders/spirv/shader5.vert.spirv";
+const auto VERT_FILE = "./shaders/spirv/shader6.vert.spirv";
 const auto FRAG_FILE = "./shaders/spirv/shader3.frag.spirv";
 const auto TEXTURE_PATH = "./models/viking_room.png";
-const auto MODEL_PATH = "models/viking_room.obj";
+const auto MODEL_PATH = "./models/viking_room.obj";
 
 const auto CUBE_VERT_FILE = "./shaders/spirv/shader1.vert.spirv";
 const auto CUBE_FRAG_FILE = "./shaders/spirv/shader1.frag.spirv";
@@ -392,12 +392,6 @@ private:
                 const auto vertex_y = attrib.vertices[3 * index.vertex_index + 1];
                 const auto vertex_z = attrib.vertices[3 * index.vertex_index + 2];
 
-                if (std::isnan(vertex_y)) {
-                    std::cout << "Heeeeeeeeeeeeeeere: " << vertex_y << std::endl;
-                }
-
-                
-               
                 vertex.pos = {vertex_x, vertex_y, vertex_z};
 
                 // update the bounding box, quick'n dirty way
@@ -419,6 +413,14 @@ private:
                         // but we've uploaded the image to Vulkan in a top-bottom orientation
                         // so we flip the vertical axis
                         1.0f - attrib.texcoords[2 * index.texcoord_index + 1] // v
+                    };
+                }
+
+                if (index.normal_index >=0) {
+                    vertex.normal = {
+                        attrib.normals[3 * index.normal_index + 0],
+                        attrib.normals[3 * index.normal_index + 1],
+                        attrib.normals[3 * index.normal_index + 2]
                     };
                 }
 
