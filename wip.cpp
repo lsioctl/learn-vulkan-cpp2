@@ -59,7 +59,7 @@ const std::vector<const char*> DEVICE_EXTENSIONS = {
 };
 
 const auto VERT_FILE = "./shaders/spirv/shader6.vert.spirv";
-const auto FRAG_FILE = "./shaders/spirv/shader3.frag.spirv";
+const auto FRAG_FILE = "./shaders/spirv/shader5.frag.spirv";
 const auto TEXTURE_PATH = "./models/viking_room.png";
 const auto MODEL_PATH = "./models/viking_room.obj";
 
