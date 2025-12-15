@@ -26,6 +26,27 @@ Note: missing validation layers (commented out because I had issues with apt) so
 ```bash
 sudo apt-get install vulkan-validationlayers
 ```
+## Prime and Ubuntu
+
+Same as for learnopengl, on my Ubuntu with prime, by default the code runs
+on embedded GPU on my laptop.
+
+That's because:
+
+* I pick up the first Vulkan capable device
+* And the first one is intel on my laptop
+
+For now, same kind of solution as with OpenGL:
+
+https://www.tuxedocomputers.com/en/PRIME-GPU-Render-Offloading/GPU-on-demand-Mode-Guide.tuxedo
+
+```bash
+__NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRARY_NAME=nvidia DRI_PRIME=1 thebinary
+```
+
+TODO: copy/paste the quick and dirty hack I used for vscode and opengl to pass those env variables
+
+Note: `vkcube` does a better job as it runs on nvidia first
 
 ## glslc
 
