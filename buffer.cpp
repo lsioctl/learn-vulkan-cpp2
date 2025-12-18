@@ -13,29 +13,29 @@ uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, Vk
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
     /**
-     * The VkPhysicalDeviceMemoryProperties structure has two arrays 
-     * memoryTypes and memoryHeaps. 
-     * Memory heaps are distinct memory resources like dedicated VRAM 
-     * and swap space in RAM for when VRAM runs out. 
-     * The different types of memory exist within these heaps. 
-     * Right now we'll only concern ourselves with the type of memory 
-     * and not the heap it comes from, but you can imagine 
+     * The VkPhysicalDeviceMemoryProperties structure has two arrays
+     * memoryTypes and memoryHeaps.
+     * Memory heaps are distinct memory resources like dedicated VRAM
+     * and swap space in RAM for when VRAM runs out.
+     * The different types of memory exist within these heaps.
+     * Right now we'll only concern ourselves with the type of memory
+     * and not the heap it comes from, but you can imagine
      * that this can affect performance.
      */
 
     /**
-     * The typeFilter parameter will be used to specify the bit field of memory types that are suitable. 
-     * That means that we can find the index of a suitable memory type by simply iterating 
+     * The typeFilter parameter will be used to specify the bit field of memory types that are suitable.
+     * That means that we can find the index of a suitable memory type by simply iterating
      * over them and checking if the corresponding bit is set to 1.
      */
 
     /**
-     * However, we're not just interested in a memory type that is suitable for the vertex buffer. 
-     * We also need to be able to write our vertex data to that memory. 
+     * However, we're not just interested in a memory type that is suitable for the vertex buffer.
+     * We also need to be able to write our vertex data to that memory.
      * The memoryTypes array consists of VkMemoryType structs that specify the heap and properties
-     * of each type of memory. The properties define special features of the memory, 
-     * like being able to map it so we can write to it from the CPU. This property is indicated 
-     * with VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, but we also need to use the 
+     * of each type of memory. The properties define special features of the memory,
+     * like being able to map it so we can write to it from the CPU. This property is indicated
+     * with VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, but we also need to use the
      * VK_MEMORY_PROPERTY_HOST_COHERENT_BIT property. We'll see why when we map the memory
      */
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
@@ -47,6 +47,9 @@ uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, Vk
     throw std::runtime_error("failed to find suitable memory type!");
 }
 
+/**
+ * This is badly named as it allocate the memory and binds it
+ */
 void bindBuffer(
     VkPhysicalDevice physicalDevice,
     VkDevice logicalDevice,
@@ -63,8 +66,8 @@ void bindBuffer(
     // like images in the swap chain vb can be owned by a specific queue family
     // or shared between multiple at the same time
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    // The flags parameter is used to configure sparse buffer memory, 
-    // which is not relevant right now. 
+    // The flags parameter is used to configure sparse buffer memory,
+    // which is not relevant right now.
     // We'll leave it at the default value of 0.
     bufferInfo.flags = 0;
 
@@ -75,13 +78,13 @@ void bindBuffer(
     // buffer has been created but no memory is assigned to it yet
     VkMemoryRequirements memRequirements;
     vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
-    
+
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
     allocInfo.memoryTypeIndex = findMemoryType(
         physicalDevice,
-        memRequirements.memoryTypeBits, 
+        memRequirements.memoryTypeBits,
         properties
     );
 
@@ -103,7 +106,7 @@ void copyBuffer(
 ) {
     VkCommandBuffer commandBuffer = commandbuffer::beginSingleTimeCommands(
       logicalDevice,
-      commandPool  
+      commandPool
     );
 
     // we have to use regions array (of VkBufferCopy structs)
@@ -176,20 +179,20 @@ void createDescriptorPool(
     poolInfo.flags = 0;
 
     /**
-     * Inadequate descriptor pools are a good example of a problem that 
-     * the validation layers will not catch: As of Vulkan 1.1, vkAllocateDescriptorSets 
-     * may fail with the error code VK_ERROR_POOL_OUT_OF_MEMORY if the pool is not sufficiently large, 
-     * but the driver may also try to solve the problem internally. This means that sometimes (depending on 
-     * hardware, pool size and allocation size) the driver will let us get away with an allocation that exceeds 
-     * the limits of our descriptor pool. Other times, vkAllocateDescriptorSets will fail and return 
-     * VK_ERROR_POOL_OUT_OF_MEMORY. This can be particularly frustrating if the allocation succeeds 
+     * Inadequate descriptor pools are a good example of a problem that
+     * the validation layers will not catch: As of Vulkan 1.1, vkAllocateDescriptorSets
+     * may fail with the error code VK_ERROR_POOL_OUT_OF_MEMORY if the pool is not sufficiently large,
+     * but the driver may also try to solve the problem internally. This means that sometimes (depending on
+     * hardware, pool size and allocation size) the driver will let us get away with an allocation that exceeds
+     * the limits of our descriptor pool. Other times, vkAllocateDescriptorSets will fail and return
+     * VK_ERROR_POOL_OUT_OF_MEMORY. This can be particularly frustrating if the allocation succeeds
      * on some machines, but fails on others.
-     * 
-     * Since Vulkan shifts the responsiblity for the allocation to the driver, 
-     * it is no longer a strict requirement to only allocate as many descriptors 
-     * of a certain type (VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, etc.) 
-     * as specified by the corresponding descriptorCount members for the creation of the descriptor pool. 
-     * However, it remains best practise to do so, and in the future, VK_LAYER_KHRONOS_validation 
+     *
+     * Since Vulkan shifts the responsiblity for the allocation to the driver,
+     * it is no longer a strict requirement to only allocate as many descriptors
+     * of a certain type (VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, etc.)
+     * as specified by the corresponding descriptorCount members for the creation of the descriptor pool.
+     * However, it remains best practise to do so, and in the future, VK_LAYER_KHRONOS_validation
      * will warn about this type of problem if you enable Best Practice Validation.
      */
 
@@ -222,7 +225,7 @@ void createDescriptorSetLayout(
     samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     samplerLayoutBinding.pImmutableSamplers = nullptr;
     // we intend to use the combined image descriptor sampler in the fragment shader
-    // It is also possible to use texture sampling in the vertex shader, 
+    // It is also possible to use texture sampling in the vertex shader,
     // for example to dynamically deform a grid of vertices by a heightmap.
     samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
