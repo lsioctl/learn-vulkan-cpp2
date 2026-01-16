@@ -1,7 +1,6 @@
 #pragma once
 
-#include "GLFW/glfw3.h"
-#include "glm/glm.hpp"
+#include "glm/glm.hpp" // IWYU pragma: keep
 
 class Camera
 {
