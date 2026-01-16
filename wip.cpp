@@ -20,9 +20,7 @@
 #include "glm/gtc/matrix_transform.hpp" // IWYU pragma: keep
 // // to easily print glm vec
 // #include "glm/gtx/string_cast.hpp"
-// could be only in one file in the project
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+
 
 #include "device.hpp"
 #include "swapchain.hpp"
@@ -33,6 +31,7 @@
 #include "texture.hpp"
 #include "image.hpp"
 #include "commandbuffer.hpp"
+#include "model.hpp"
 
 #ifdef NDEBUG
     const bool ENABLE_VALIDATION_LAYERS = false;
@@ -190,34 +189,23 @@ private:
     VkFormat depthFormat_;
     VkDeviceMemory depthImageMemory_;
     VkImageView depthImageView_;
-    std::vector<vertex::Vertex> vertices_;
-    std::vector<uint32_t> indices_;
+    
     // it will be updated regarding the hardware capabilities
     VkSampleCountFlagBits msaaSampleCount_ = VK_SAMPLE_COUNT_1_BIT;
     VkImage colorImage_;
     VkDeviceMemory colorImageMemory_;
     VkImageView colorImageView_;
-    // prepare the bounding box
-    float min_x_{};
-    float min_y_{};
-    float min_z_{};
-    float max_x_{};
-    float max_y_{};
-    float max_z_{};
+    
     float scaling_{1.};
 
-    void setScaling() {
-        std::cout << "Bounding box: " << std::endl;
-        std::cout << "Min x: " << min_x_ << std::endl;
-        std::cout << "Min y: " << min_y_ << std::endl;
-        std::cout << "Min z: " << min_z_ << std::endl;
-        std::cout << "Max x: " << max_x_ << std::endl;
-        std::cout << "Max y: " << max_y_ << std::endl;
-        std::cout << "Max z: " << max_z_ << std::endl;
+    Model model_;
 
-        const auto span_x = max_x_ - min_x_;
-        const auto span_y = max_y_ - min_y_;
-        const auto span_z = max_z_ - min_z_;
+    void setScaling() {
+        Model::BoundingBox boundingbox = model_.getBoundingBox();
+
+        const auto span_x = boundingbox.max_x_ - boundingbox.min_x_;
+        const auto span_y = boundingbox.max_y_ - boundingbox.min_y_;
+        const auto span_z = boundingbox.max_z_ - boundingbox.min_z_;
 
         const auto max_1 = fmax(span_x, span_y);
         const auto max_span = fmax(max_1, span_z);
@@ -365,77 +353,6 @@ private:
         );
     }
 
-    void loadModel() {
-        /**
-         * The attrib container holds all of the positions, normals and texture coordinates
-         * in its attrib.vertices, attrib.normals and attrib.texcoords vectors.
-         * The shapes container contains all of the separate objects and their faces.
-         * Each face consists of an array of vertices, and each vertex contains
-         * the indices of the position, normal and texture coordinate attributes.
-         * OBJ models can also define a material and texture per face, but we will be ignoring those.
-         */
-        tinyobj::attrib_t attrib;
-        std::vector<tinyobj::shape_t> shapes;
-        std::vector<tinyobj::material_t> materials;
-        std::string warn, err;
-
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH)) {
-            throw std::runtime_error(warn + err);
-        }
-
-
-        // We're going to combine all of the faces in the file into a single model, so just iterate over all of the shapes:
-        for (const auto& shape : shapes) {
-            // The triangulation feature has already made sure that there are three vertices per face,
-            // so we can now directly iterate over the vertices and dump them straight into our vertices vector:
-            for (const auto& index : shape.mesh.indices) {
-                vertex::Vertex vertex{};
-
-                 // attrib.vertices array is an array of float values instead of something like glm::vec3
-                const auto vertex_x = attrib.vertices[3 * index.vertex_index + 0];
-                const auto vertex_y = attrib.vertices[3 * index.vertex_index + 1];
-                const auto vertex_z = attrib.vertices[3 * index.vertex_index + 2];
-
-                vertex.pos = {vertex_x, vertex_y, vertex_z};
-
-                // update the bounding box, quick'n dirty way
-                if (vertex_x < min_x_) min_x_ = vertex_x;
-                if (vertex_y < min_y_) min_y_ = vertex_y;
-                if (vertex_z < min_z_) min_z_ = vertex_z;
-
-                if (vertex_x > max_x_) max_x_ = vertex_x;
-                if (vertex_y > max_y_) max_y_ = vertex_y;
-                if (vertex_z > max_z_) max_z_ = vertex_z;
-
-
-                // Similarly, there are two texture coordinate components per entry.
-                // Texture coordinates (if available)
-                if (index.texcoord_index >= 0) {
-                    vertex.texCoord = {
-                        attrib.texcoords[2 * index.texcoord_index + 0], // u
-                        // for OBJ format 0 means the bottom of the image
-                        // but we've uploaded the image to Vulkan in a top-bottom orientation
-                        // so we flip the vertical axis
-                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1] // v
-                    };
-                }
-
-                if (index.normal_index >=0) {
-                    vertex.normal = {
-                        attrib.normals[3 * index.normal_index + 0],
-                        attrib.normals[3 * index.normal_index + 1],
-                        attrib.normals[3 * index.normal_index + 2]
-                    };
-                }
-
-                vertex.color = {1.0f, 1.0f, 1.0f};
-
-                vertices_.push_back(vertex);
-                // For simplicity, we will assume that every vertex is unique for now, hence the simple auto-increment indices.
-                indices_.push_back(indices_.size());
-            }
-        }
-    }
 
     void createImageViews() {
         swapchain::createImageViews(
@@ -593,7 +510,7 @@ private:
             device_,
             commandPool_,
             graphicsQueue_,
-            vertices_,
+            model_.getVertices(),
             vertexBuffer_,
             vertexBufferMemory_
         );
@@ -606,7 +523,7 @@ private:
             device_,
             commandPool_,
             graphicsQueue_,
-            indices_,
+            model_.getIndices(),
             indexBuffer_,
             indexBufferMemory_
         );
@@ -726,7 +643,7 @@ private:
         vkCmdDrawIndexed(
             commandBuffer,
             // now index count instead of vertex count as we draw indexed
-            static_cast<uint32_t>(indices_.size()),
+            static_cast<uint32_t>(model_.getIndices().size()),
             // instanceCount: Used for instanced rendering, use 1 if you're not doing that.
             1,
             // first index
@@ -1015,6 +932,9 @@ private:
         // we'll take care of this in the render pass.
     }
 
+    void loadModel() {
+        model_.loadModel(MODEL_PATH);
+    }
 
     void initVulkan() {
         device::printExtensions();
@@ -1146,7 +1066,7 @@ private:
     }
 };
 
-int main() {
+int main(int argc, char* argv[]) {
     HelloTriangleApplication app;
 
     try {
