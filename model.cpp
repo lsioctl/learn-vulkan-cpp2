@@ -21,6 +21,8 @@ void Model::loadModel(const char* filePath) {
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
+    std::cout << "Starting model loading" << std::endl;
+
     if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filePath)) {
         throw std::runtime_error(warn + err);
     }
@@ -76,13 +78,16 @@ void Model::loadModel(const char* filePath) {
             // For simplicity, we will assume that every vertex is unique for now, hence the simple auto-increment indices.
             indices_.push_back(indices_.size());
 
-            std::cout << "Bounding box: " << std::endl;
-            std::cout << "Min x: " << boudingBox_.min_x_ << std::endl;
-            std::cout << "Min y: " << boudingBox_.min_y_ << std::endl;
-            std::cout << "Min z: " << boudingBox_.min_z_ << std::endl;
-            std::cout << "Max x: " << boudingBox_.max_x_ << std::endl;
-            std::cout << "Max y: " << boudingBox_.max_y_ << std::endl;
-            std::cout << "Max z: " << boudingBox_.max_z_ << std::endl;
+            
         }
     }
+
+    std::cout << "Model loaded" << std::endl;
+    std::cout << "Bounding box: " << std::endl;
+    std::cout << "Min x: " << boudingBox_.min_x_ << std::endl;
+    std::cout << "Min y: " << boudingBox_.min_y_ << std::endl;
+    std::cout << "Min z: " << boudingBox_.min_z_ << std::endl;
+    std::cout << "Max x: " << boudingBox_.max_x_ << std::endl;
+    std::cout << "Max y: " << boudingBox_.max_y_ << std::endl;
+    std::cout << "Max z: " << boudingBox_.max_z_ << std::endl;
 }

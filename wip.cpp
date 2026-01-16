@@ -60,7 +60,7 @@ const std::vector<const char*> DEVICE_EXTENSIONS = {
 const auto VERT_FILE = "./shaders/spirv/shader6.vert.spirv";
 const auto FRAG_FILE = "./shaders/spirv/shader5.frag.spirv";
 const auto TEXTURE_PATH = "./models/viking_room.png";
-const auto MODEL_PATH = "./models/viking_room.obj";
+// const auto MODEL_PATH = "./models/viking_room.obj";
 
 const auto CUBE_VERT_FILE = "./shaders/spirv/shader1.vert.spirv";
 const auto CUBE_FRAG_FILE = "./shaders/spirv/shader1.frag.spirv";
@@ -113,8 +113,9 @@ struct DestroyglfwWin{
 
 class HelloTriangleApplication {
 public:
-    void run() {
+    void run(const char* modelFileName) {
         initWindow();
+        loadModel(modelFileName);
         initVulkan();
         mainLoop();
         cleanup();
@@ -932,8 +933,8 @@ private:
         // we'll take care of this in the render pass.
     }
 
-    void loadModel() {
-        model_.loadModel(MODEL_PATH);
+    void loadModel(const char* filePath) {
+        model_.loadModel(filePath);
     }
 
     void initVulkan() {
@@ -946,7 +947,7 @@ private:
         createSurface();
         pickPhysicalDeviceAndSetMSAASampleCount();
         createLogicalDevice();
-        loadModel();
+        // TODO: this needs model loaded already
         setScaling();
         createSwapChain();
         createImageViews();
@@ -1069,8 +1070,15 @@ private:
 int main(int argc, char* argv[]) {
     HelloTriangleApplication app;
 
+    if (argc != 2) {
+        std::cerr << "Usage: app path_to_obj_file" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    auto model_path = argv[1];
+
     try {
-        app.run();
+        app.run(model_path);
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
