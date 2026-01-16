@@ -22,6 +22,10 @@ Camera::Camera() :
 {
 }
 
+void Camera::resetLastMouseEvent() {
+    first_mouse_event_ = true;
+}
+
 void Camera::updateOrientation(double mouse_x_pos, double mouse_y_pos)
 {
     if (first_mouse_event_ == true)

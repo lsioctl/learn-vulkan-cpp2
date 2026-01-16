@@ -29,6 +29,7 @@ public:
         Left
     };
     void updatePosition(Movement camera_movement, float delta_time);
+    void resetLastMouseEvent();
     /** 
      * TODO: why not delta_time dependant ?
      * maybe it is a silly question
