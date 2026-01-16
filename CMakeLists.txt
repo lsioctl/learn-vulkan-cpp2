@@ -8,6 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # very weird it doesn´t work later on this file ...
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# I think it forces build type so cmake -dCMAKE_BUILD_TYPE won't work,
+# please change here if you want Debug
+set(CMAKE_BUILD_TYPE Release)
+
 # Find required packages
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
