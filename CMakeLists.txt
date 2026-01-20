@@ -24,7 +24,7 @@ if(UNIX AND NOT APPLE)
     message(STATUS "Linux configuration detected")
 elseif(APPLE)
     # macOS configuration
-    find_package(Cocoa REQUIRED)
+    # find_package(Cocoa REQUIRED)
     message(STATUS "macOS configuration detected")
 else()
     message(FATAL_ERROR "Unsupported platform")
@@ -56,12 +56,12 @@ if(UNIX AND NOT APPLE)
         X11::X11
         X11::Xrandr
     )
-elseif(APPLE)
-    # macOS linking
-    target_link_libraries(${PROJECT_NAME}
-        PRIVATE
-        Cocoa::Cocoa
-    )
+# elseif(APPLE)
+#     # macOS linking
+#     target_link_libraries(${PROJECT_NAME}
+#         PRIVATE
+#         Cocoa::Cocoa
+#     )
 endif()
 
 # Include directories

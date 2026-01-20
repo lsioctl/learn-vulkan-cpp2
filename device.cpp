@@ -167,6 +167,9 @@ std::vector<const char*> getRequiredExtensions(bool enable_validation_layers) {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
+    // Neeeded for macos, at least with Metal
+    extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+
     return extensions;
 }
 

@@ -294,6 +294,8 @@ private:
         // a lot of information on vk is passed through structs instead of function parameters
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+        // Needed for macos, at least with Metal
+        createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
         createInfo.pApplicationInfo = &appInfo;
 
         // create an additional debugger for vkCreateInstance and vkDestroyInstance
