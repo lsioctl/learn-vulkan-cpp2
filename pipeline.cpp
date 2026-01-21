@@ -26,7 +26,6 @@ static std::vector<char> readFile(const std::string& filename) {
     size_t fileSize = (size_t) file.tellg();
     std::vector<char> buffer(fileSize);
 
-    // TODO: is it really safe ?
     // seek back to the beginning of the file
     // and read all at once
     file.seekg(0);
@@ -48,7 +47,7 @@ std::vector<uint32_t> compileFile(
     shaderc::Compiler compiler;
     shaderc::CompileOptions options;
 
-    std::cout << "Compiling shaders ..." << std::endl;
+    std::cout << "Compiling shader: " << sourceName << std::endl;
 
     // Like -DMY_DEFINE=1
     // options.AddMacroDefinition("MY_DEFINE", "1");

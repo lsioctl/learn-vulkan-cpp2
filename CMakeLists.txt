@@ -15,6 +15,9 @@ set(CMAKE_BUILD_TYPE Release)
 # Find required packages
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
+#find_package(shaderc REQUIRED)
+
+find_library(SHADERC_LIBRARY shaderc)
 
 # Platform-specific configurations
 if(UNIX AND NOT APPLE)
@@ -39,6 +42,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
     glfw
     ${Vulkan_LIBRARIES}
+    ${SHADERC_LIBRARY}
 )
 
 # Headers only libraries

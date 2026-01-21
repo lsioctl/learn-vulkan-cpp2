@@ -20,6 +20,8 @@ sudo apt install spirv-tools
 sudo apt install libglfw3-dev
 sudo apt install libglm-dev
 sudo apt install libxxf86vm-dev libxi-dev
+# for online shader compilation
+sudo apt install libshaderc-dev
 ```
 
 Note: missing validation layers (commented out because I had issues with apt) so:
@@ -60,14 +62,23 @@ Work in progress
 * molten
 * glfw
 * glm
+* shaderc
 
-## glslc
+## glslc DEPRECATED
+
+DEPRECATED: now shader compilation is done online
+
+Moreover it would be wiser to install glslc from apt or brew.
+
+The tutorial says Vulkan SDK embeds glslc (maybe the whole shaderc ?)
 
 Download from github README
 
 Update the `env` copied from `env.example` in shaders folder
 
-## shader compilation
+## shader compilation DEPRECATED
+
+DEPRECATED: now shader compilation is done online
 
 go to the shaders folder, with glslc installed and configured anr run:
 
