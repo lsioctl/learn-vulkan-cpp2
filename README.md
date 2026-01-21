@@ -7,8 +7,9 @@ Continuation of following the tutorial in the repo learn-vulkan-cpp
 
 https://vulkan-tutorial.com
 
+## Ubuntu
 
-## Pre-requisities on Ubuntu
+### Pre-requisities
 
 ```bash
 sudo apt install vulkan-tools
@@ -26,7 +27,8 @@ Note: missing validation layers (commented out because I had issues with apt) so
 ```bash
 sudo apt-get install vulkan-validationlayers
 ```
-## Prime and Ubuntu
+
+### Prime
 
 Same as for learnopengl, on my Ubuntu with prime, by default the code runs
 on embedded GPU on my laptop.
@@ -47,6 +49,17 @@ __NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRA
 TODO: copy/paste the quick and dirty hack I used for vscode and opengl to pass those env variables
 
 Note: `vkcube` does a better job as it runs on nvidia first
+
+## MacOS
+
+Work in progress
+
+## Install all via brew
+
+* vulkan (TODO: which ones)
+* molten
+* glfw
+* glm
 
 ## glslc
 
@@ -83,6 +96,12 @@ either explicitely with pipeline memory barriers or implicitely during render pa
 > It should be noted that in a real world application, you're not supposed to actually call vkAllocateMemory for every individual buffer. The maximum number of simultaneous memory allocations is limited by the maxMemoryAllocationCount physical device limit, which may be as low as 4096 even on high end hardware like an NVIDIA GTX 1080. The right way to allocate memory for a large number of objects at the same time is to create a custom allocator that splits up a single allocation among many different objects by using the offset parameters that we've seen in many functions.
 
 > You can either implement such an allocator yourself, or use the VulkanMemoryAllocator library provided by the GPUOpen initiative. However, for this tutorial it's okay to use a separate allocation for every resource, because we won't come close to hitting any of these limits for now.
+
+Note: issue encounterd with lucy obj, as vertices + indices where slightly above 4GB, the size of my GPU's RAM.
+
+For now I did a quick'n dirty hook, loading indices on host RAM and vertices on GPU RAM.
+
+Testes on Blender, which uses vk_mem_alloc.h (VulkanMemoryAllocator), it works without any issues
 
 
 ### Index buffer
@@ -176,4 +195,83 @@ https://vkguide.dev/
 
 Legacy one uses render passes
 
-https://vkguide.dev/docs/old_vkguide/
+https://vkguide.dev/docs/old_vkguide
+
+### MacOS
+
+Had a driver not found and came to the same solution as the recommandation of Dave Hunter
+
+on 
+
+https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Validation_layers
+
+> First, when setting values for createInfo, add the following.
+createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+
+Next, in GetRequiredExtensions, under if (enableValidationLayers) add the following line.
+
+extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+
+### The vulkan loader
+
+MacOS issues made me dig a bit more the loader
+
+Excellent documentation here:
+
+https://github.com/KhronosGroup/Vulkan-Loader/blob/main/docs/LoaderInterfaceArchitecture.md
+
+As a side note on Ubuntu ICD files and more are here:
+
+```bash
+find /usr/share/vulkan
+/usr/share/vulkan
+/usr/share/vulkan/implicit_layer.d
+/usr/share/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
+/usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+/usr/share/vulkan/icd.d
+/usr/share/vulkan/icd.d/gfxstream_vk_icd.x86_64.json
+/usr/share/vulkan/icd.d/virtio_icd.x86_64.json
+/usr/share/vulkan/icd.d/nouveau_icd.x86_64.json
+/usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+/usr/share/vulkan/icd.d/intel_icd.x86_64.json
+/usr/share/vulkan/icd.d/nvidia_icd.json
+/usr/share/vulkan/icd.d/radeon_icd.x86_64.json
+/usr/share/vulkan/icd.d/intel_hasvk_icd.x86_64.json
+/usr/share/vulkan/explicit_layer.d
+/usr/share/vulkan/explicit_layer.d/VkLayer_INTEL_nullhw.json
+/usr/share/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json
+/usr/share/vulkan/explicit_layer.d/VkLayer_khronos_validation.json
+/usr/share/vulkan/registry
+/usr/share/vulkan/registry/parse_dependency.py
+/usr/share/vulkan/registry/apiconventions.py
+/usr/share/vulkan/registry/cgenerator.py
+/usr/share/vulkan/registry/validusage.json
+/usr/share/vulkan/registry/video.xml
+/usr/share/vulkan/registry/reg.py
+/usr/share/vulkan/registry/vkconventions.py
+/usr/share/vulkan/registry/stripAPI.py
+/usr/share/vulkan/registry/vk.xml
+/usr/share/vulkan/registry/profiles
+/usr/share/vulkan/registry/profiles/VP_KHR_roadmap_2022.json
+/usr/share/vulkan/registry/spec_tools
+/usr/share/vulkan/registry/spec_tools/conventions.py
+/usr/share/vulkan/registry/spec_tools/util.py
+/usr/share/vulkan/registry/generator.py
+```
+
+```bash
+$ cat /usr/share/vulkan/icd.d/nvidia_icd.json
+{
+    "file_format_version" : "1.0.1",
+    "ICD": {
+        "library_path": "libGLX_nvidia.so.0",
+        "api_version" : "1.4.312"
+    }
+}
+```
+
+```bash
+$ dpkg -S /usr/share/vulkan/icd.d/nvidia_icd.json
+libnvidia-gl-580:amd64: /usr/share/vulkan/icd.d/nvidia_icd.json
+```
+
