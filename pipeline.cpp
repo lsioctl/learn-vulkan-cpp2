@@ -1,5 +1,10 @@
+#include <cstdint>
+#include <shaderc/shaderc.h>
 #include <vector>
 #include <fstream>
+#include <iostream>
+
+#include <shaderc/shaderc.hpp>
 
 #include "pipeline.hpp"
 #include "vertex.hpp"
@@ -32,12 +37,54 @@ static std::vector<char> readFile(const std::string& filename) {
     return buffer;
 }
 
+// Compiles a shader to a SPIR-V binary. Returns the binary as
+// a vector of 32-bit words.
+std::vector<uint32_t> compileFile(
+    const std::string& sourceName,
+    shaderc_shader_kind kind,
+    const std::string& source,
+    bool optimize = false
+) {
+    shaderc::Compiler compiler;
+    shaderc::CompileOptions options;
+
+    std::cout << "Compiling shaders ..." << std::endl;
+
+    // Like -DMY_DEFINE=1
+    // options.AddMacroDefinition("MY_DEFINE", "1");
+    if (optimize) options.SetOptimizationLevel(shaderc_optimization_level_size);
+
+    shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, kind, sourceName.c_str(), options);
+
+    if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
+        throw std::runtime_error(module.GetErrorMessage());
+        return std::vector<uint32_t>();
+    }
+
+    return {module.cbegin(), module.cend()};
+}
+
 VkShaderModule createShaderModule(const std::vector<char>& code, VkDevice logical_device) {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = code.size();
     // TODO: why reinterpret_cast and not static_cast ?
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+    VkShaderModule shaderModule;
+    if (vkCreateShaderModule(logical_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create shader module!");
+    }
+
+    return shaderModule;
+}
+
+VkShaderModule createShaderModule2(const std::vector<uint32_t>& code, VkDevice logical_device) {
+    VkShaderModuleCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    // This one got me: codeSize in bytes
+    createInfo.codeSize = 4 * code.size();
+    createInfo.pCode = code.data();
 
     VkShaderModule shaderModule;
     if (vkCreateShaderModule(logical_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
@@ -190,9 +237,9 @@ void createRenderPass(
 }
 
 void createGraphicsPipeline(
-    const char* vert_file,
-    const char* frag_file,
-    VkDevice logical_device,
+    const char* vertFile,
+    const char* fragFile,
+    VkDevice logicalDevice,
     VkExtent2D swapChainExtent,
     VkSampleCountFlagBits msaaSampleCount,
     VkRenderPass renderPass,
@@ -200,11 +247,23 @@ void createGraphicsPipeline(
     VkPipelineLayout& pipelineLayout,
     VkPipeline& graphicsPipeline
 ) {
-    auto vertShaderCode = readFile(vert_file);
-    auto fragShaderCode = readFile(frag_file);
+    auto vertShaderSourceCode = readFile(vertFile);
+    auto fragShaderSourceCode = readFile(fragFile);
 
-    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode, logical_device);
-    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode, logical_device);
+    auto vertShaderCode = compileFile(
+        vertFile, 
+        shaderc_glsl_vertex_shader,
+        std::string{vertShaderSourceCode.cbegin(), vertShaderSourceCode.cend()}
+    );
+
+    auto fragShaderCode = compileFile(
+        fragFile, 
+        shaderc_glsl_fragment_shader,
+        std::string{fragShaderSourceCode.cbegin(), fragShaderSourceCode.cend()}
+    );
+
+    VkShaderModule vertShaderModule = createShaderModule2(vertShaderCode, logicalDevice);
+    VkShaderModule fragShaderModule = createShaderModule2(fragShaderCode, logicalDevice);
 
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -392,7 +451,7 @@ void createGraphicsPipeline(
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
-    if (vkCreatePipelineLayout(logical_device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout!");
     }
 
@@ -438,29 +497,41 @@ void createGraphicsPipeline(
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
 
-    if (vkCreateGraphicsPipelines(logical_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+    if (vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
-    vkDestroyShaderModule(logical_device, fragShaderModule, nullptr);
-    vkDestroyShaderModule(logical_device, vertShaderModule, nullptr);
+    vkDestroyShaderModule(logicalDevice, fragShaderModule, nullptr);
+    vkDestroyShaderModule(logicalDevice, vertShaderModule, nullptr);
 }
 
 void createCubePipeline(
-    const char* vert_file,
-    const char* frag_file,
-    VkDevice logical_device,
+    const char* vertFile,
+    const char* fragFile,
+    VkDevice logicalDevice,
     VkExtent2D swapChainExtent,
     VkSampleCountFlagBits msaaSampleCount,
     VkRenderPass renderPass,
     VkPipelineLayout& pipelineLayout,
     VkPipeline& graphicsPipeline
 ) {
-    auto vertShaderCode = readFile(vert_file);
-    auto fragShaderCode = readFile(frag_file);
+    auto vertShaderSourceCode = readFile(vertFile);
+    auto fragShaderSourceCode = readFile(fragFile);
 
-    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode, logical_device);
-    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode, logical_device);
+    auto vertShaderCode = compileFile(
+        vertFile, 
+        shaderc_glsl_vertex_shader,
+        std::string{vertShaderSourceCode.cbegin(), vertShaderSourceCode.cend()}
+    );
+
+    auto fragShaderCode = compileFile(
+        fragFile, 
+        shaderc_glsl_fragment_shader,
+        std::string{fragShaderSourceCode.cbegin(), fragShaderSourceCode.cend()}
+    );
+
+    VkShaderModule vertShaderModule = createShaderModule2(vertShaderCode, logicalDevice);
+    VkShaderModule fragShaderModule = createShaderModule2(fragShaderCode, logicalDevice);
 
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -649,7 +720,7 @@ void createCubePipeline(
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
-    if (vkCreatePipelineLayout(logical_device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout!");
     }
 
@@ -695,12 +766,12 @@ void createCubePipeline(
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
 
-    if (vkCreateGraphicsPipelines(logical_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+    if (vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
-    vkDestroyShaderModule(logical_device, fragShaderModule, nullptr);
-    vkDestroyShaderModule(logical_device, vertShaderModule, nullptr);
+    vkDestroyShaderModule(logicalDevice, fragShaderModule, nullptr);
+    vkDestroyShaderModule(logicalDevice, vertShaderModule, nullptr);
 }
 
 } // end of namespace pipeline

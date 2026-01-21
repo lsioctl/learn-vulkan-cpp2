@@ -275,3 +275,19 @@ $ dpkg -S /usr/share/vulkan/icd.d/nvidia_icd.json
 libnvidia-gl-580:amd64: /usr/share/vulkan/icd.d/nvidia_icd.json
 ```
 
+### SPIRV reflection
+
+In Vulkan-Samples/framework/core/shader_module.cpp
+
+```cpp
+// Reflection is used to dynamically create descriptor bindings
+
+	SPIRVReflection spirv_reflection;
+	// Reflect all shader resources
+	if (!spirv_reflection.reflect_shader_resources(stage, spirv, resources, shader_variant))
+```
+
+### Online shader compilation
+
+https://github.com/google/shaderc/blob/main/examples/online-compile/main.cc
+

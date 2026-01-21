@@ -17,6 +17,7 @@
                 "buffer.cpp",
                 "commandbuffer.cpp",
                 "texture.cpp",
+                "model.cpp",
                 "${file}",
                 "-o",
                 "${fileDirname}/build/${fileBasenameNoExtension}",
@@ -28,6 +29,7 @@
                 "-lXxf86vm",
                 "-lXrandr",
                 "-lXi",
+                "-lshaderc",
             ],
             "options": {
                 "cwd": "${fileDirname}"

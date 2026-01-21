@@ -57,13 +57,13 @@ const std::vector<const char*> DEVICE_EXTENSIONS = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-const auto VERT_FILE = "./shaders/spirv/shader6.vert.spirv";
-const auto FRAG_FILE = "./shaders/spirv/shader5.frag.spirv";
+const auto VERT_FILE = "./shaders/shader6.vert.glsl";
+const auto FRAG_FILE = "./shaders/shader5.frag.glsl";
 const auto TEXTURE_PATH = "./models/viking_room.png";
 // const auto MODEL_PATH = "./models/viking_room.obj";
 
-const auto CUBE_VERT_FILE = "./shaders/spirv/shader1.vert.spirv";
-const auto CUBE_FRAG_FILE = "./shaders/spirv/shader1.frag.spirv";
+const auto CUBE_VERT_FILE = "./shaders/shader1.vert.glsl";
+const auto CUBE_FRAG_FILE = "./shaders/shader1.frag.glsl";
 
 const std::vector<vertex::Vertex> vertices = {
     {
