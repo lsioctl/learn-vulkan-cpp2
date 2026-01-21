@@ -24,7 +24,8 @@ void main() {
     float diffuseComponent = max(dot(normal, lightDirection), 0.0);
     vec3 diffuse = diffuseComponent * lightColor;
 
-    outColor = vec4((ambient + diffuse), 1.0) * texture(texSampler, fragTexCoord);
+    // outColor = vec4((ambient + diffuse), 1.0) * texture(texSampler, fragTexCoord);
+    outColor = vec4((ambient + diffuse), 1.0);
     // outColor = vec4(1.0);
     // outColor = vec4(normal, 1.0);
     // outColor = vec4(inNormal, 1.0);
