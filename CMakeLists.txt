@@ -28,7 +28,7 @@ if(UNIX AND NOT APPLE)
     message(STATUS "Linux configuration detected")
 elseif(APPLE)
     # macOS configuration
-    find_library(SHADERC_LIBRARY libshaderc_shared.so)
+    find_library(SHADERC_LIBRARY libshaderc_shared.dylib)
     # find_package(Cocoa REQUIRED)
     message(STATUS "macOS configuration detected")
 else()
