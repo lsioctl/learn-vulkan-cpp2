@@ -15,18 +15,20 @@ set(CMAKE_BUILD_TYPE Release)
 # Find required packages
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
-#find_package(shaderc REQUIRED)
-
-find_library(SHADERC_LIBRARY shaderc)
 
 # Platform-specific configurations
 if(UNIX AND NOT APPLE)
     # Linux configuration
+    # TODO: works only on Ubuntu !
+    # on RedHat it seems to be the same name as in brew:
+    # libshaderc_shared.so
+    find_library(SHADERC_LIBRARY libshaderc.so)
     find_package(X11 REQUIRED)
     # find_package(Xrandr REQUIRED)
     message(STATUS "Linux configuration detected")
 elseif(APPLE)
     # macOS configuration
+    find_library(SHADERC_LIBRARY libshaderc_shared.so)
     # find_package(Cocoa REQUIRED)
     message(STATUS "macOS configuration detected")
 else()
