@@ -17,12 +17,12 @@ public:
         return indices_;
     }
     struct BoundingBox {
-        float min_x_;
-        float min_y_;
-        float min_z_;
-        float max_x_;
-        float max_y_;
-        float max_z_;
+        float min_x_{0.0};
+        float min_y_{0.0};
+        float min_z_{0.0};
+        float max_x_{0.0};
+        float max_y_{0.0};
+        float max_z_{0.0};
     };
     const BoundingBox getBoundingBox() const noexcept {
         return boundingBox_;

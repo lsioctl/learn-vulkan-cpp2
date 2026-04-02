@@ -35,7 +35,6 @@ void Model::loadModel(const char* filePath) {
         for (const auto& index : shape.mesh.indices) {
             vertex::Vertex vertex{};
 
-                // attrib.vertices array is an array of float values instead of something like glm::vec3
             const auto vertex_x = attrib.vertices[3 * index.vertex_index + 0];
             const auto vertex_y = attrib.vertices[3 * index.vertex_index + 1];
             const auto vertex_z = attrib.vertices[3 * index.vertex_index + 2];
@@ -77,8 +76,6 @@ void Model::loadModel(const char* filePath) {
             vertices_.push_back(vertex);
             // For simplicity, we will assume that every vertex is unique for now, hence the simple auto-increment indices.
             indices_.push_back(indices_.size());
-
-            
         }
     }
 
