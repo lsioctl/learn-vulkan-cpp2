@@ -25,11 +25,11 @@ public:
         float max_z_;
     };
     const BoundingBox getBoundingBox() const noexcept {
-        return boudingBox_;
+        return boundingBox_;
     }
     
 private:
     std::vector<vertex::Vertex> vertices_;
     std::vector<uint32_t> indices_;
-    BoundingBox boudingBox_;
+    BoundingBox boundingBox_;
 };
