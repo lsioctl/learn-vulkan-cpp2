@@ -43,13 +43,13 @@ void Model::loadModel(const char* filePath) {
             vertex.pos = {vertex_x, vertex_y, vertex_z};
 
             // update the bounding box, quick'n dirty way
-            if (vertex_x < boudingBox_.min_x_) boudingBox_.min_x_ = vertex_x;
-            if (vertex_y < boudingBox_.min_y_) boudingBox_.min_y_ = vertex_y;
-            if (vertex_z < boudingBox_.min_z_) boudingBox_.min_z_ = vertex_z;
+            if (vertex_x < boundingBox_.min_x_) boundingBox_.min_x_ = vertex_x;
+            if (vertex_y < boundingBox_.min_y_) boundingBox_.min_y_ = vertex_y;
+            if (vertex_z < boundingBox_.min_z_) boundingBox_.min_z_ = vertex_z;
 
-            if (vertex_x > boudingBox_.max_x_) boudingBox_.max_x_ = vertex_x;
-            if (vertex_y > boudingBox_.max_y_) boudingBox_.max_y_ = vertex_y;
-            if (vertex_z > boudingBox_.max_z_) boudingBox_.max_z_ = vertex_z;
+            if (vertex_x > boundingBox_.max_x_) boundingBox_.max_x_ = vertex_x;
+            if (vertex_y > boundingBox_.max_y_) boundingBox_.max_y_ = vertex_y;
+            if (vertex_z > boundingBox_.max_z_) boundingBox_.max_z_ = vertex_z;
 
 
             // Similarly, there are two texture coordinate components per entry.
@@ -84,10 +84,10 @@ void Model::loadModel(const char* filePath) {
 
     std::cout << "Model loaded" << std::endl;
     std::cout << "Bounding box: " << std::endl;
-    std::cout << "Min x: " << boudingBox_.min_x_ << std::endl;
-    std::cout << "Min y: " << boudingBox_.min_y_ << std::endl;
-    std::cout << "Min z: " << boudingBox_.min_z_ << std::endl;
-    std::cout << "Max x: " << boudingBox_.max_x_ << std::endl;
-    std::cout << "Max y: " << boudingBox_.max_y_ << std::endl;
-    std::cout << "Max z: " << boudingBox_.max_z_ << std::endl;
+    std::cout << "Min x: " << boundingBox_.min_x_ << std::endl;
+    std::cout << "Min y: " << boundingBox_.min_y_ << std::endl;
+    std::cout << "Min z: " << boundingBox_.min_z_ << std::endl;
+    std::cout << "Max x: " << boundingBox_.max_x_ << std::endl;
+    std::cout << "Max y: " << boundingBox_.max_y_ << std::endl;
+    std::cout << "Max z: " << boundingBox_.max_z_ << std::endl;
 }
