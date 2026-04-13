@@ -62,8 +62,8 @@ const auto FRAG_FILE = "./shaders/shader5.frag.glsl";
 const auto TEXTURE_PATH = "./models/viking_room.png";
 // const auto MODEL_PATH = "./models/viking_room.obj";
 
-const auto CUBE_VERT_FILE = "./shaders/shader1.vert.glsl";
-const auto CUBE_FRAG_FILE = "./shaders/shader1.frag.glsl";
+const auto CUBE_VERT_FILE = "./shaders/shader7.vert.glsl";
+const auto CUBE_FRAG_FILE = "./shaders/shader7.frag.glsl";
 
 const std::vector<vertex::Vertex> vertices = {
     {
