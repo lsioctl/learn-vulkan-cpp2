@@ -400,7 +400,7 @@ private:
         // TODO: pipeline very identical except shaders,
         // maybe derive the pipeline instead ?
         // also: see pipeline cache
-        pipeline::createCubePipeline(
+        pipeline::createGraphicsPipeline(
             CUBE_VERT_FILE,
             CUBE_FRAG_FILE,
             device_,
@@ -410,6 +410,7 @@ private:
             // VK_SAMPLE_COUNT_1_BIT,
             msaaSampleCount_,
             renderPass_,
+            descriptorSetLayout_,
             cubePipelineLayout_,
             cubePipeline_
         );
