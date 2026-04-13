@@ -5,32 +5,50 @@
 // layout(location = 2) in vec2 inTexCoord;
 // layout(location = 3) in vec3 inNormal;
 
-// layout(binding = 0) uniform UniformBufferObject {
-//     mat4 model;
-//     mat4 view;
-//     mat4 proj;
-// } ubo;
+layout(binding = 0) uniform UniformBufferObject {
+    mat4 model;
+    mat4 view;
+    mat4 proj;
+} ubo;
 
 layout(location = 0) out vec3 fragColor;
 
 // should be in vertex buffer
 // but vertex buffer in vk will be seen later on
-vec2 positions[3] = vec2[](
-    vec2(-0.5, 0.5),
-    vec2(0.5, 0.5),
-    vec2(0.0, -0.5)
+vec3 positions[12] = vec3[](
+    vec3(-0.5, 0.5, 0.5), // 1, bottom left front
+    vec3(0.5, 0.5, 0.5), // 2, bottom right front
+    vec3(0.5, -0.5, 0.5), // 3 top right front
+    vec3(0.5, -0.5, 0.5), // 3 top right front
+    vec3(-0.5, -0.5, 0.5), // 4 top left front
+    vec3(-0.5, 0.5, 0.5), // 1, bottom left front
+    vec3(0.5, -0.5, 0.5), // 3 top right front
+    vec3(0.5, 0.5, 0.5), // 2, bottom right front
+    vec3(0.5, 0.5, -0.5), // 7, bottom right back
+    vec3(0.5, 0.5, -0.5), // 7, bottom right back
+    vec3(0.5, -0.5, -0.5), // 6, top right back
+    vec3(0.5, -0.5, 0.5) // 3 top right front
 );
 
-vec3 colors[3] = vec3[](
-    vec3(1.0, 0.0, 0.0),
-    vec3(0.0, 1.0, 0.0),
-    vec3(0.0, 0.0, 1.0)
+vec3 colors[12] = vec3[](
+    vec3(0.0, 0.0, 0.0), // 1, bottom left front
+    vec3(1.0, 0.0, 0.0), // 2, bottom right front
+    vec3(1.0, 1.0, 0.0), // 3 top right front
+    vec3(1.0, 1.0, 0.0), // 3 top right front
+    vec3(0.0, 1.0, 0.0), // 4 top left front
+    vec3(0.0, 0.0, 0.0), // 1, bottom left front
+    vec3(1.0, 1.0, 0.0), // 3 top right front
+    vec3(1.0, 0.0, 0.0), // 2, bottom right front
+    vec3(1.0, 0.0, 1.0), // 7, bottom right back
+    vec3(1.0, 0.0, 1.0), // 7, bottom right back
+    vec3(1.0, 1.0, 1.0), // 6, top right back
+    vec3(1.0, 1.0, 0.0) // 3 top right front
 );
 
 void main() {
     // gl_Position = vec4(inPosition, 1.0);
     // fragColor = inColor;
     // The built-in gl_VertexIndex variable contains the index of the current vertex.
-    gl_Position = vec4(positions[gl_VertexIndex], 0.5, 1.0);
+    gl_Position = ubo.model * vec4(positions[gl_VertexIndex], 1.0);
     fragColor = colors[gl_VertexIndex];
 }
