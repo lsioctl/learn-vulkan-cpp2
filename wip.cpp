@@ -717,8 +717,10 @@ private:
         auto position = glm::vec3(0.0f,  0.5f, 0.0f);
         ubo.model = glm::translate(cube_model_matrix, position);
         ubo.model = glm::scale(ubo.model, glm::vec3(scaling_));
-        // ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        // ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+        // be wary that the order of rotation is reversed
+        // TODO: why ? Maybe because of MVP in matrix multiplication is reverse to p*v*m ?
+        ubo.model = glm::rotate(ubo.model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        ubo.model = glm::rotate(ubo.model, glm::radians(-90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
 
         ubo.view = camera_.getUpdatedViewMatrix();
 
