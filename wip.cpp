@@ -82,7 +82,7 @@ void errorCallback(int error, const char* description)
     fprintf(stderr, "Error: %s\n", description);
 }
 
-void processInput(GLFWwindow *window, Camera& camera, float delta_time) {
+void processInput(GLFWwindow *window, Camera& camera/*, glm::mat4& model*/, float delta_time) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
@@ -103,6 +103,18 @@ void processInput(GLFWwindow *window, Camera& camera, float delta_time) {
     {
         camera.updatePosition(Camera::Movement::Right, delta_time);
     }
+    // if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+    // {
+    //     glm::rotate(model, glm::radians(90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
+    // }
+    // if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+    // {
+    //     glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    // }
+    // if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+    // {
+    //     glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    // }
 }
 
 struct DestroyglfwWin{
@@ -200,6 +212,8 @@ private:
     float scaling_{1.};
 
     Model model_;
+
+    glm::mat4 model_matrix_;
 
     void setScaling() {
         Model::BoundingBox boundingbox = model_.getBoundingBox();
@@ -709,21 +723,11 @@ private:
     void updateUniformBuffer(uint32_t currentImage) {
         buffer::UniformBufferObject ubo{};
 
-        // Model matrix
-        // Used to transform local (object coordinates) to world coordinates
-        // always start with identity
-        glm::mat4 cube_model_matrix{glm::mat4(1.0f)};
-        // be wary we have an inversion on y axis (see later on the projection matrix)
-        auto position = glm::vec3(0.0f,  0.5f, 0.0f);
-        ubo.model = glm::translate(cube_model_matrix, position);
-        ubo.model = glm::scale(ubo.model, glm::vec3(scaling_));
-        // be wary that the order of rotation is reversed
-        // TODO: why ? Maybe because of MVP in matrix multiplication is reverse to p*v*m ?
-        ubo.model = glm::rotate(ubo.model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        ubo.model = glm::rotate(ubo.model, glm::radians(-90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
+        ubo.model = model_matrix_;
 
         ubo.view = camera_.getUpdatedViewMatrix();
 
+        // TODO: move outside of the update loop as it does not change
         ubo.proj = glm::perspective(
             // 45 degrees vertical fov
             glm::radians(45.0f),
@@ -942,6 +946,21 @@ private:
         model_.loadModel(filePath);
     }
 
+    void initModelMatrix() {
+        // Model matrix
+        // Used to transform local (object coordinates) to world coordinates
+        // always start with identity
+        model_matrix_ = glm::mat4(1.0f);
+        // be wary we have an inversion on y axis (see later on the projection matrix)
+        auto position = glm::vec3(0.0f,  0.5f, 0.0f);
+        model_matrix_ = glm::translate(model_matrix_, position);
+        model_matrix_ = glm::scale(model_matrix_, glm::vec3(scaling_));
+        // be wary that the order of rotation is reversed
+        // TODO: why ? Maybe because of MVP in matrix multiplication is reverse to p*v*m ?
+        model_matrix_= glm::rotate(model_matrix_, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model_matrix_ = glm::rotate(model_matrix_, glm::radians(-90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
+    }
+
     void initVulkan() {
         device::printExtensions();
         createInstance();
@@ -954,6 +973,7 @@ private:
         createLogicalDevice();
         // TODO: this needs model loaded already
         setScaling();
+        initModelMatrix();
         createSwapChain();
         createImageViews();
         createColorResources();
