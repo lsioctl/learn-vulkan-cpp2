@@ -664,7 +664,7 @@ private:
         // vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
         // vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-        vkCmdDraw(commandBuffer, 12, 1, 0, 0);
+        vkCmdDraw(commandBuffer, 36, 1, 0, 0);
 
         vkCmdEndRenderPass(commandBuffer);
 
