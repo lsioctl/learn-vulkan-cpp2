@@ -82,39 +82,32 @@ void errorCallback(int error, const char* description)
     fprintf(stderr, "Error: %s\n", description);
 }
 
-void processInput(GLFWwindow *window, Camera& camera/*, glm::mat4& model*/, float delta_time) {
+
+void processInput(GLFWwindow *window, Camera& camera, glm::mat4& modelMatrix, float deltaTime) {
+    // ensure rotated only once
+    // TODO: maybe not the best pattern :D
+    auto rotated = false;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        camera.updatePosition(Camera::Movement::Front, delta_time);
+        camera.updatePosition(Camera::Movement::Front, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        camera.updatePosition(Camera::Movement::Back, delta_time);
+        camera.updatePosition(Camera::Movement::Back, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        camera.updatePosition(Camera::Movement::Left, delta_time);
+        camera.updatePosition(Camera::Movement::Left, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        camera.updatePosition(Camera::Movement::Right, delta_time);
+        camera.updatePosition(Camera::Movement::Right, deltaTime);
     }
-    // if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-    // {
-    //     glm::rotate(model, glm::radians(90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
-    // }
-    // if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
-    // {
-    //     glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    // }
-    // if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-    // {
-    //     glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    // }
 }
 
 struct DestroyglfwWin{
@@ -213,7 +206,7 @@ private:
 
     Model model_;
 
-    glm::mat4 model_matrix_;
+    glm::mat4 modelMatrix_;
 
     void setScaling() {
         Model::BoundingBox boundingbox = model_.getBoundingBox();
@@ -275,6 +268,24 @@ private:
         }
     }
 
+    static void rotation_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (key == GLFW_KEY_X && action == GLFW_PRESS)
+        {
+            auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
+        }
+        if (key == GLFW_KEY_Y && action == GLFW_PRESS)
+        {
+            auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0f), glm::vec3(0.0f, 0.1f, 0.0f));
+        }
+        if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+        {
+            auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 0.1f));
+        }
+    }
+
 
     void initWindow() {
         glfwSetErrorCallback(errorCallback);
@@ -286,6 +297,7 @@ private:
         // for mouse callback and framebufferResizeCallback
         glfwSetWindowUserPointer(window_.get(), this);
         glfwSetFramebufferSizeCallback(window_.get(), framebufferResizeCallback);
+        glfwSetKeyCallback(window_.get(), rotation_key_callback);
         // std::cout << window_ << std::endl;
     }
 
@@ -723,7 +735,7 @@ private:
     void updateUniformBuffer(uint32_t currentImage) {
         buffer::UniformBufferObject ubo{};
 
-        ubo.model = model_matrix_;
+        ubo.model = modelMatrix_;
 
         ubo.view = camera_.getUpdatedViewMatrix();
 
@@ -950,15 +962,15 @@ private:
         // Model matrix
         // Used to transform local (object coordinates) to world coordinates
         // always start with identity
-        model_matrix_ = glm::mat4(1.0f);
+        modelMatrix_ = glm::mat4(1.0f);
         // be wary we have an inversion on y axis (see later on the projection matrix)
         auto position = glm::vec3(0.0f,  0.5f, 0.0f);
-        model_matrix_ = glm::translate(model_matrix_, position);
-        model_matrix_ = glm::scale(model_matrix_, glm::vec3(scaling_));
+        modelMatrix_ = glm::translate(modelMatrix_, position);
+        modelMatrix_ = glm::scale(modelMatrix_, glm::vec3(scaling_));
         // be wary that the order of rotation is reversed
         // TODO: why ? Maybe because of MVP in matrix multiplication is reverse to p*v*m ?
-        model_matrix_= glm::rotate(model_matrix_, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        model_matrix_ = glm::rotate(model_matrix_, glm::radians(-90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
+        // modelMatrix_= glm::rotate(modelMatrix_, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        // modelMatrix_ = glm::rotate(modelMatrix_, glm::radians(-90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
     }
 
     void initVulkan() {
@@ -996,7 +1008,7 @@ private:
     }
 
     void mainLoop() {
-        // for delta_time
+        // for deltaTime
         auto last_frame_time = 0.0f;
 
         // cursor enabled while I find a way to escape capturing
@@ -1007,13 +1019,13 @@ private:
         while (!glfwWindowShouldClose(window_.get())) {
             glfwPollEvents();
 
-            // delta_time
+            // deltaTime
             auto current_frame_time = glfwGetTime();
-            auto delta_time = current_frame_time - last_frame_time;
+            auto deltaTime = current_frame_time - last_frame_time;
             last_frame_time = current_frame_time;
 
-            processInput(window_.get(), camera_, delta_time);
-            // std::cout << delta_time << std::endl;
+            processInput(window_.get(), camera_, modelMatrix_, deltaTime);
+            // std::cout << deltaTime << std::endl;
             // std::cout << glm::to_string(camera_.getPosition()) << std::endl;
             // std::cout << glm::to_string(camera_.getFront()) << std::endl;
             // std::cout << camera_.getPitch() << std::endl;
