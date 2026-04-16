@@ -84,10 +84,6 @@ void errorCallback(int error, const char* description)
 
 
 void processInput(GLFWwindow *window, Camera& camera, glm::mat4& modelMatrix, float deltaTime) {
-    // ensure rotated only once
-    // TODO: maybe not the best pattern :D
-    auto rotated = false;
-
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
@@ -110,7 +106,7 @@ void processInput(GLFWwindow *window, Camera& camera, glm::mat4& modelMatrix, fl
     }
 }
 
-struct DestroyglfwWin{
+struct DestroyglfwWin {
     void operator()(GLFWwindow* ptr){
          glfwDestroyWindow(ptr);
     }

@@ -93,10 +93,19 @@ vec3 colors[36] = vec3[](
     vec3(1.0, 1.0, 0.0) // 3 top right front
 );
 
+// Scaling and translation
+// glm seems to use columns matrices
+mat4 modelMatrix = mat4(
+    0.2, 0.0, 0.0, 0.0, // col1
+    0.0, 0.2, 0.0, 0.0, // col2
+    0.0, 0.0, 0.2, 0.0, // col3
+    0.8, 0.8, 0.0, 1 // col4
+);
+
 void main() {
     // gl_Position = vec4(inPosition, 1.0);
     // fragColor = inColor;
     // The built-in gl_VertexIndex variable contains the index of the current vertex.
-    gl_Position = ubo.proj * ubo.view * vec4(positions[gl_VertexIndex], 1.0);
+    gl_Position = ubo.proj * ubo.view * modelMatrix * vec4(positions[gl_VertexIndex], 1.0);
     fragColor = colors[gl_VertexIndex];
 }
