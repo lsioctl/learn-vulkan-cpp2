@@ -336,7 +336,7 @@ private:
             createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
 
             device::populateDebugMessengerCreateInfo(debugCreateInfo);
-            createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
+            createInfo.pNext = &debugCreateInfo;
         } else {
             createInfo.enabledLayerCount = 0;
 
