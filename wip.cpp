@@ -71,13 +71,13 @@ const auto CUBE_FRAG_FILE = "./shaders/shader7.frag.glsl";
 
 const std::vector<vertex::Vertex> vertices = {
     {
-        {0.0F, -0.5f, 0.0F}, {1.0F, 0.0F, 0.0F}, {0.0F, 0.0F}
+        {0.0F, -0.5F, 0.0F}, {1.0F, 0.0F, 0.0F}, {0.0F, 0.0F}
     },
     {
-        {0.5f, 0.5f, 0.0F}, {0.0F, 1.0F, 0.0F}, {0.0F, 0.0F}
+        {0.5F, 0.5F, 0.0F}, {0.0F, 1.0F, 0.0F}, {0.0F, 0.0F}
     },
     {
-        {-0.5f, 0.5f, 0.0F}, {0.0F, 0.0F, 1.0F}, {0.0F, 0.0F}
+        {-0.5F, 0.5F, 0.0F}, {0.0F, 0.0F, 1.0F}, {0.0F, 0.0F}
     }
 };
 
@@ -218,7 +218,7 @@ private:
         const auto max_1 = fmax(span_x, span_y);
         const auto max_span = fmax(max_1, span_z);
 
-        if (max_span > 1) scaling_ = 1. / max_span;
+        if (max_span > 1) { scaling_ = 1. / max_span; }
     }
 
     void createSurface() {
