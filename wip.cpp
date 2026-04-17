@@ -202,7 +202,7 @@ private:
     VkDeviceMemory colorImageMemory_;
     VkImageView colorImageView_;
     
-    float scaling_{1.};
+    double scaling_{1};
 
     Model model_;
 
@@ -218,7 +218,7 @@ private:
         const auto max_1 = fmax(span_x, span_y);
         const auto max_span = fmax(max_1, span_z);
 
-        if (max_span > 1) { scaling_ = 1. / max_span; }
+        if (max_span > 1) { scaling_ = 1 / max_span; }
     }
 
     void createSurface() {
@@ -1118,6 +1118,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
+    // NOLINTNEXTLINE (cppcoreguidelines-pro-bounds-pointer-arithmetic)
     auto* model_path = argv[1];
 
     try {
