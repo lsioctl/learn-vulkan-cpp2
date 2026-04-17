@@ -252,6 +252,7 @@ private:
      * this pointer is retrieved through window pointer and a, IMO
      * kind of dirty hook with glfwSetWindowUserPointer and glfwGetWindowUserPointer
      * */
+    // NOLINTNEXTLINE (bugprone-easily-swappable-parameters)
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
         auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
         app->framebufferResized_ = true;
@@ -268,6 +269,7 @@ private:
         }
     }
 
+    // NOLINTNEXTLINE (bugprone-easily-swappable-parameters)
     static void rotation_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_X && action == GLFW_PRESS)
         {
@@ -766,7 +768,7 @@ private:
         vkWaitForFences(device_, 1, &inFlightFences_[currentFrame_], VK_TRUE, UINT64_MAX);
 
 
-        uint32_t imageIndex;
+        uint32_t imageIndex = 0;
         // extension so vk...KHR naming
         VkResult result = vkAcquireNextImageKHR(
             device_,
