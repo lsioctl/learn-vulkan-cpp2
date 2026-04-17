@@ -90,7 +90,7 @@ void errorCallback(int error, const char* description)
 void processInput(GLFWwindow *window, Camera& camera, glm::mat4& modelMatrix, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
-        glfwSetWindowShouldClose(window, true);
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
@@ -1021,7 +1021,7 @@ private:
         // glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursorPosCallback(window_.get(), mouseCallback);
 
-        while (!glfwWindowShouldClose(window_.get())) {
+        while (glfwWindowShouldClose(window_.get()) == GLFW_FALSE) {
             glfwPollEvents();
 
             // deltaTime
