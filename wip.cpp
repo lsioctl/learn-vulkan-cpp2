@@ -7,7 +7,11 @@
 #include <optional>
 #include <cstdint>
 #include <memory>
+#include <array>
+
+
 #include <vulkan/vulkan_core.h>
+
 
 // Let GLFW include by itslef vulkan headers
 #define GLFW_INCLUDE_VULKAN
@@ -631,9 +635,9 @@ private:
 
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline_);
 
-        VkBuffer vertexBuffers[] = {vertexBuffer_};
-        VkDeviceSize offsets[] = {0};
-        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+        std::array<VkBuffer, 1> vertexBuffers = {vertexBuffer_};
+        std::array<VkDeviceSize, 1> offsets = {0};
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers.data(), offsets.data());
 
         // we can have only one index buffer
         // we used a 32 bit for storage for the indices
@@ -782,8 +786,9 @@ private:
             recreateSwapChain();
             // try again in the next drawFrame call
             return;
-        //
-        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        }
+        
+        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
@@ -802,16 +807,17 @@ private:
         // submitting the command buffer
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        VkSemaphore waitSemaphores[] = {imageAvailableSemaphores_[currentFrame_]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        std::array<VkSemaphore, 1> waitSemaphores = {imageAvailableSemaphores_[currentFrame_]};
+        std::array<VkPipelineStageFlags, 1> waitStages = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
+        submitInfo.pWaitSemaphores = waitSemaphores.data();
+        submitInfo.pWaitDstStageMask = waitStages.data();
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffers_[currentFrame_];
-        VkSemaphore signalSemaphores[] = {renderFinishedSemaphores_[currentFrame_]};
+
+        std::array<VkSemaphore, 1> signalSemaphores = {renderFinishedSemaphores_[currentFrame_]};
         submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
+        submitInfo.pSignalSemaphores = signalSemaphores.data();
 
         if (vkQueueSubmit(graphicsQueue_, 1, &submitInfo, inFlightFences_[currentFrame_]) != VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
@@ -824,10 +830,10 @@ private:
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
         presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
-        VkSwapchainKHR swapChains[] = {swapChain_};
+        presentInfo.pWaitSemaphores = signalSemaphores.data();
+        std::array<VkSwapchainKHR, 1> swapChains = {swapChain_};
         presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
+        presentInfo.pSwapchains = swapChains.data();
         presentInfo.pImageIndices = &imageIndex;
         presentInfo.pResults = nullptr; // Optional
 
@@ -1109,7 +1115,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    auto model_path = argv[1];
+    auto* model_path = argv[1];
 
     try {
         app.run(model_path);

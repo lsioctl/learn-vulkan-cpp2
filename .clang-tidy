@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,*,clang-analyzer-*,-llvm*,-google-readability-todo,-altera-unroll-loops,-performance-avoid-endl,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,*,clang-analyzer-*,-llvm*,-google-readability-todo,-altera-unroll-loops,-performance-avoid-endl,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-modernize-use-trailing-return-type'
 WarningsAsErrors: ''
 HeaderFileExtensions:
   - ''
