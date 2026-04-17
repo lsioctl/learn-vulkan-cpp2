@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,*,clang-analyzer-*,-llvm*,-google-readability-todo,-altera-unroll-loops'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,*,clang-analyzer-*,-llvm*,-google-readability-todo,-altera-unroll-loops,-performance-avoid-endl,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers'
 WarningsAsErrors: ''
 HeaderFileExtensions:
   - ''
@@ -132,13 +132,6 @@ CheckOptions:
   cert-str34-c.DiagnoseSignedUnsignedCharComparisons: 'false'
   concurrency-mt-unsafe.FunctionSet: any
   cppcoreguidelines-avoid-do-while.IgnoreMacros: 'false'
-  cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues: 'false'
-  cppcoreguidelines-avoid-magic-numbers.IgnoreBitFieldsWidths: 'true'
-  cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues: 'false'
-  cppcoreguidelines-avoid-magic-numbers.IgnoreTypeAliases: 'false'
-  cppcoreguidelines-avoid-magic-numbers.IgnoreUserDefinedLiterals: 'false'
-  cppcoreguidelines-avoid-magic-numbers.IgnoredFloatingPointValues: '1.0;100.0;'
-  cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues: '1;2;3;4;'
   cppcoreguidelines-explicit-virtual-functions.AllowOverrideAndFinal: 'false'
   cppcoreguidelines-explicit-virtual-functions.FinalSpelling: final
   cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors: 'false'
@@ -382,13 +375,6 @@ CheckOptions:
   readability-implicit-bool-conversion.AllowPointerConditions: 'false'
   readability-inconsistent-declaration-parameter-name.IgnoreMacros: 'true'
   readability-inconsistent-declaration-parameter-name.Strict: 'false'
-  readability-magic-numbers.IgnoreAllFloatingPointValues: 'false'
-  readability-magic-numbers.IgnoreBitFieldsWidths: 'true'
-  readability-magic-numbers.IgnorePowersOf2IntegerValues: 'false'
-  readability-magic-numbers.IgnoreTypeAliases: 'false'
-  readability-magic-numbers.IgnoreUserDefinedLiterals: 'false'
-  readability-magic-numbers.IgnoredFloatingPointValues: '1.0;100.0;'
-  readability-magic-numbers.IgnoredIntegerValues: '1;2;3;4;'
   readability-operators-representation.BinaryOperators: ''
   readability-operators-representation.OverloadedOperators: ''
   readability-qualified-auto.AddConstToQualified: 'true'

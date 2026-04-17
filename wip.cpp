@@ -67,13 +67,13 @@ const auto CUBE_FRAG_FILE = "./shaders/shader7.frag.glsl";
 
 const std::vector<vertex::Vertex> vertices = {
     {
-        {0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}
+        {0.0F, -0.5f, 0.0F}, {1.0F, 0.0F, 0.0F}, {0.0F, 0.0F}
     },
     {
-        {0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}
+        {0.5f, 0.5f, 0.0F}, {0.0F, 1.0F, 0.0F}, {0.0F, 0.0F}
     },
     {
-        {-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}
+        {-0.5f, 0.5f, 0.0F}, {0.0F, 0.0F, 1.0F}, {0.0F, 0.0F}
     }
 };
 
@@ -268,17 +268,17 @@ private:
         if (key == GLFW_KEY_X && action == GLFW_PRESS)
         {
             auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
-            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
+            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0F), glm::vec3(0.1f, 0.0F, 0.0F));
         }
         if (key == GLFW_KEY_Y && action == GLFW_PRESS)
         {
             auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
-            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0f), glm::vec3(0.0f, 0.1f, 0.0f));
+            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0F), glm::vec3(0.0F, 0.1f, 0.0F));
         }
         if (key == GLFW_KEY_Z && action == GLFW_PRESS)
         {
             auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
-            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 0.1f));
+            app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0F), glm::vec3(0.0F, 0.0F, 0.1f));
         }
     }
 
@@ -492,7 +492,8 @@ private:
     void recreateSwapChain() {
         // custom handling of minimization:
         // we wait until it is over
-        int width = 0, height = 0;
+        int width = 0;
+        int height = 0;
         glfwGetFramebufferSize(window_.get(), &width, &height);
 
         while (width == 0 || height == 0) {
@@ -616,11 +617,11 @@ private:
         // TODO: still coupling here as I moved the code to pipeline
         // for VK_ATTACHMENT_LOAD_OP_CLEAR, which we used as load operation for the color attachment
         // black with 100% opacity
-        clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+        clearValues[0].color = {{0.0F, 0.0F, 0.0F, 1.0F}};
         // The range of depths in the depth buffer is 0.0 to 1.0 in Vulkan, where 1.0 lies at the
         // far view plane and 0.0 at the near view plane. The initial value at each point in the
         // depth buffer should be the furthest possible depth, which is 1.0.
-        clearValues[1].depthStencil = {1.0f, 0};
+        clearValues[1].depthStencil = {1.0F, 0};
 
         renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
         renderPassInfo.pClearValues = clearValues.data();
@@ -642,12 +643,12 @@ private:
         // as we defined viewport and scissor state to be dynamic
         // we need to set them in the command buffer before the draw command
         VkViewport viewport{};
-        viewport.x = 0.0f;
-        viewport.y = 0.0f;
+        viewport.x = 0.0F;
+        viewport.y = 0.0F;
         viewport.width = static_cast<float>(swapChainExtent_.width);
         viewport.height = static_cast<float>(swapChainExtent_.height);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
+        viewport.minDepth = 0.0F;
+        viewport.maxDepth = 1.0F;
         vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
         VkRect2D scissor{};
@@ -738,13 +739,13 @@ private:
         // TODO: move outside of the update loop as it does not change
         ubo.proj = glm::perspective(
             // 45 degrees vertical fov
-            glm::radians(45.0f),
+            glm::radians(45.0F),
             // aspect ratio
             swapChainExtent_.width / static_cast<float>(swapChainExtent_.height),
             // near plane
-            0.1f,
+            0.1F,
             // far plane
-            100.0f
+            100.0F
         );
 
         // trick because glm is for opengl, where y axis is inverted
@@ -958,15 +959,15 @@ private:
         // Model matrix
         // Used to transform local (object coordinates) to world coordinates
         // always start with identity
-        modelMatrix_ = glm::mat4(1.0f);
+        modelMatrix_ = glm::mat4(1.0F);
         // be wary we have an inversion on y axis (see later on the projection matrix)
-        auto position = glm::vec3(0.0f,  0.5f, 0.0f);
+        auto position = glm::vec3(0.0F,  0.5F, 0.0F);
         modelMatrix_ = glm::translate(modelMatrix_, position);
         modelMatrix_ = glm::scale(modelMatrix_, glm::vec3(scaling_));
         // be wary that the order of rotation is reversed
         // TODO: why ? Maybe because of MVP in matrix multiplication is reverse to p*v*m ?
-        // modelMatrix_= glm::rotate(modelMatrix_, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        // modelMatrix_ = glm::rotate(modelMatrix_, glm::radians(-90.0f), glm::vec3(0.1f, 0.0f, 0.0f));
+        // modelMatrix_= glm::rotate(modelMatrix_, glm::radians(-90.0F), glm::vec3(0.0F, 1.0F, 0.0F));
+        // modelMatrix_ = glm::rotate(modelMatrix_, glm::radians(-90.0F), glm::vec3(0.1f, 0.0F, 0.0F));
     }
 
     void initVulkan() {
@@ -1005,7 +1006,7 @@ private:
 
     void mainLoop() {
         // for deltaTime
-        auto last_frame_time = 0.0f;
+        auto last_frame_time = 0.0F;
 
         // cursor enabled while I find a way to escape capturing
         // without escape button
