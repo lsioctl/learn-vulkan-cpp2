@@ -1,4 +1,5 @@
 #include <cmath>
+#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -207,6 +208,7 @@ private:
     Model model_;
 
     glm::mat4 modelMatrix_;
+    glm::mat4 projectionMatrix_;
 
     void setScaling() {
         Model::BoundingBox boundingbox = model_.getBoundingBox();
@@ -739,25 +741,9 @@ private:
         buffer::UniformBufferObject ubo{};
 
         ubo.model = modelMatrix_;
+        ubo.proj = projectionMatrix_;
 
         ubo.view = camera_.getUpdatedViewMatrix();
-
-        // TODO: move outside of the update loop as it does not change
-        ubo.proj = glm::perspective(
-            // 45 degrees vertical fov
-            glm::radians(45.0F),
-            // aspect ratio
-            // NOLINTNEXTLINE (cppcoreguidelines-narrowing-conversions)
-            swapChainExtent_.width / static_cast<float>(swapChainExtent_.height),
-            // near plane
-            0.1F,
-            // far plane
-            100.0F
-        );
-
-        // trick because glm is for opengl, where y axis is inverted
-        // here flip the sign of the scaling factor on th y axis
-        ubo.proj[1][1] *= -1;
 
         // all transformations defined, we can copy
         // no staging buffer, and memory already mapped
@@ -979,6 +965,29 @@ private:
         // modelMatrix_ = glm::rotate(modelMatrix_, glm::radians(-90.0F), glm::vec3(0.1F, 0.0F, 0.0F));
     }
 
+    /**
+    * Must be called after swapChain creation
+    * TODO: this becomes more and more messy for the state dependencies
+    */
+    void initProjectionMatrix() {
+        // TODO: move outside of the update loop as it does not change
+        projectionMatrix_ = glm::perspective(
+            // 45 degrees vertical fov
+            glm::radians(45.0F),
+            // aspect ratio
+            // NOLINTNEXTLINE (cppcoreguidelines-narrowing-conversions)
+            swapChainExtent_.width / static_cast<float>(swapChainExtent_.height),
+            // near plane
+            0.1F,
+            // far plane
+            100.0F
+        );
+
+        // trick because glm is for opengl, where y axis is inverted
+        // here flip the sign of the scaling factor on th y axis
+        projectionMatrix_[1][1] *= -1;
+    }
+
     void initVulkan() {
         device::printExtensions();
         createInstance();
@@ -993,6 +1002,7 @@ private:
         setScaling();
         initModelMatrix();
         createSwapChain();
+        initProjectionMatrix();
         createImageViews();
         createColorResources();
         createDepthResources();
