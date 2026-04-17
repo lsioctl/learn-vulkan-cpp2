@@ -249,17 +249,17 @@ private:
      * kind of dirty hook with glfwSetWindowUserPointer and glfwGetWindowUserPointer
      * */
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-        auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+        auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
         app->framebufferResized_ = true;
     }
 
     static void mouseCallback(GLFWwindow* window, double x_pos, double y_pos) {
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-            auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
             app->camera_.updateOrientation(x_pos, y_pos);
         }
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_RELEASE) {
-            auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
             app->camera_.resetLastMouseEvent();
         }
     }
@@ -267,17 +267,17 @@ private:
     static void rotation_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_X && action == GLFW_PRESS)
         {
-            auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
             app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0F), glm::vec3(0.1F, 0.0F, 0.0F));
         }
         if (key == GLFW_KEY_Y && action == GLFW_PRESS)
         {
-            auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
             app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0F), glm::vec3(0.0F, 0.1F, 0.0F));
         }
         if (key == GLFW_KEY_Z && action == GLFW_PRESS)
         {
-            auto app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+            auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
             app->modelMatrix_ = glm::rotate(app->modelMatrix_, glm::radians(90.0F), glm::vec3(0.0F, 0.0F, 0.1F));
         }
     }
