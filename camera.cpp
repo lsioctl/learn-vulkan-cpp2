@@ -18,7 +18,7 @@ Camera::Camera() :
     // it is not really used (see mouse callback)
     last_mouse_x_{400.},
     last_mouse_y_{300.},
-    speed_coeff_{2.5f}
+    speed_coeff_{2.5}
 {
 }
 
@@ -64,7 +64,7 @@ void Camera::updateOrientation(double mouse_x_pos, double mouse_y_pos)
 // Change the global variable camera_pos
 // takes global variables camera_front, camera_up, delta_time
 // as hidden parameters
-void Camera::updatePosition(Movement camera_movement, float delta_time)
+void Camera::updatePosition(Movement camera_movement, double delta_time)
 {
     // ensure the speed is the same regardless of the frame rate
     const float camera_speed = speed_coeff_ * delta_time;

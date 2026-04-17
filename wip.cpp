@@ -87,7 +87,7 @@ void errorCallback(int error, const char* description)
 }
 
 
-void processInput(GLFWwindow *window, Camera& camera, glm::mat4& modelMatrix, float deltaTime) {
+void processInput(GLFWwindow *window, Camera& camera, double deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -747,6 +747,7 @@ private:
             // 45 degrees vertical fov
             glm::radians(45.0F),
             // aspect ratio
+            // NOLINTNEXTLINE (cppcoreguidelines-narrowing-conversions)
             swapChainExtent_.width / static_cast<float>(swapChainExtent_.height),
             // near plane
             0.1F,
@@ -1014,7 +1015,7 @@ private:
 
     void mainLoop() {
         // for deltaTime
-        auto last_frame_time = 0.0F;
+        auto last_frame_time = 0.0;
 
         // cursor enabled while I find a way to escape capturing
         // without escape button
@@ -1029,7 +1030,7 @@ private:
             auto deltaTime = current_frame_time - last_frame_time;
             last_frame_time = current_frame_time;
 
-            processInput(window_.get(), camera_, modelMatrix_, deltaTime);
+            processInput(window_.get(), camera_, deltaTime);
             // std::cout << deltaTime << std::endl;
             // std::cout << glm::to_string(camera_.getPosition()) << std::endl;
             // std::cout << glm::to_string(camera_.getFront()) << std::endl;

@@ -15,7 +15,7 @@ private:
     float sensitivity_;
     float last_mouse_x_;
     float last_mouse_y_;
-    float speed_coeff_;
+    double speed_coeff_;
     // View matrix
     // transform from world coordinate to 'camera' coordinates
     glm::mat4 view_matrix_{};
@@ -27,7 +27,7 @@ public:
         Right,
         Left
     };
-    void updatePosition(Movement camera_movement, float delta_time);
+    void updatePosition(Movement camera_movement, double delta_time);
     void resetLastMouseEvent();
     /** 
      * TODO: why not delta_time dependant ?
