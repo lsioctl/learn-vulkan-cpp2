@@ -70,7 +70,10 @@ VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avai
         // choice of the author of the tutorial
         // he says on mobile device, where consumption is prime
         // it may be better to choose VK_PRESENT_MODE_FIFO_KHR
-        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+        // Switched to FIFO as mailbox was consuming too much CPU
+        // See: https://www.reddit.com/r/vulkan/comments/o8i3dm/high_cpu_and_gpu_usage_just_by_drawing_a_triangle/
+        // TODO: understand better what was happening in MAILBOX mode
+        if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
             return availablePresentMode;
         }
     }
