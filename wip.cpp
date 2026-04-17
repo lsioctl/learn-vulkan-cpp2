@@ -453,11 +453,11 @@ private:
     void cleanupSwapChain() {
         // Unlike images, imageViews have been created manually
         // so we need to destroy them
-        for (auto imageView : swapChainImageViews_) {
+        for (auto* imageView : swapChainImageViews_) {
             vkDestroyImageView(device_, imageView, nullptr);
         }
 
-        for (auto framebuffer : swapChainFramebuffers_) {
+        for (auto* framebuffer : swapChainFramebuffers_) {
             vkDestroyFramebuffer(device_, framebuffer, nullptr);
         }
 
