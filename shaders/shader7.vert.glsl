@@ -1,9 +1,10 @@
 #version 450
 
-// layout(location = 0) in vec3 inPosition;
-// layout(location = 1) in vec3 inColor;
-// layout(location = 2) in vec2 inTexCoord;
-// layout(location = 3) in vec3 inNormal;
+// _ prefix for unused layouy locations
+layout(location = 0) in vec3 _inPosition;
+layout(location = 1) in vec3 _inColor;
+layout(location = 2) in vec2 _inTexCoord;
+layout(location = 3) in vec3 _inNormal;
 
 layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
