@@ -26,13 +26,19 @@ void main() {
     vec3 diffuse = diffuseComponent * lightColor;
 
     bool fragOnEdge = false;
+    // Did not really understand this part
+    // I get why we need a derivative, but not how it is calculated
+    float lineWidth = 0.5; 
+    vec3 derivative = fwidth(inBarycentricCoordinate);
 
-    if ((inBarycentricCoordinate.x < 0.01) || (inBarycentricCoordinate.y < 0.01) || (inBarycentricCoordinate.z < 0.01)) {
+    if ((inBarycentricCoordinate.x < (derivative.x * lineWidth)) 
+        || (inBarycentricCoordinate.y < (derivative.y * lineWidth)) 
+        || (inBarycentricCoordinate.z < (derivative.z * lineWidth))) {
         fragOnEdge = true;
     }
 
     // outColor = vec4((ambient + diffuse), 1.0) * texture(texSampler, fragTexCoord);
-    if (! fragOnEdge) {
+    if (!fragOnEdge) {
         outColor = vec4((ambient + diffuse), 1.0);
     } else {
         outColor = vec4(0.0, 0.0, 0.0, 1.0);
