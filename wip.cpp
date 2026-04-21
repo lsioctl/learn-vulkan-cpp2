@@ -978,7 +978,7 @@ private:
             // NOLINTNEXTLINE (cppcoreguidelines-narrowing-conversions)
             swapChainExtent_.width / static_cast<float>(swapChainExtent_.height),
             // near plane
-            0.1F,
+            0.01F,
             // far plane
             100.0F
         );

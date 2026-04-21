@@ -18,7 +18,7 @@ Camera::Camera() :
     // it is not really used (see mouse callback)
     last_mouse_x_{400.},
     last_mouse_y_{300.},
-    speed_coeff_{2.5}
+    speed_coeff_{1.}
 {
 }
 
