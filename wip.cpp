@@ -62,8 +62,8 @@ const std::vector<const char*> DEVICE_EXTENSIONS = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-const auto VERT_FILE = "./shaders/shader6.vert.glsl";
-const auto FRAG_FILE = "./shaders/shader5.frag.glsl";
+const auto VERT_FILE = "./shaders/shader8.vert.glsl";
+const auto FRAG_FILE = "./shaders/shader8.frag.glsl";
 const auto TEXTURE_PATH = "./models/viking_room.png";
 // const auto MODEL_PATH = "./models/viking_room.obj";
 
