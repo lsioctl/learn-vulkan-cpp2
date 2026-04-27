@@ -182,11 +182,17 @@ private:
     VkBuffer indexBuffer_;
     VkDeviceMemory indexBufferMemory_;
     std::vector<VkBuffer> uniformBuffers_;
+    std::vector<VkBuffer> axisUniformBuffers_;
     std::vector<VkDeviceMemory> uniformBuffersMemory_;
+    std::vector<VkDeviceMemory> axisUniformBuffersMemory_;
     std::vector<void*> uniformBuffersMapped_;
+    std::vector<void*> axisUniformBuffersMapped_;
     VkDescriptorPool descriptorPool_;
+    VkDescriptorPool aixsDescriptorPool_;
     std::vector<VkDescriptorSet> descriptorSets_;
+    std::vector<VkDescriptorSet> axisDescriptorSets_;
     Camera camera_;
+    Camera axisCamera_;
     VkImage textureImage_;
     uint32_t mipLevels_;
     VkDeviceMemory textureImageMemory_;
@@ -264,10 +270,12 @@ private:
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
             auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
             app->camera_.updateOrientation(x_pos, y_pos);
+            app->axisCamera_.updateOrientation(x_pos, y_pos);
         }
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_RELEASE) {
             auto* app = static_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
             app->camera_.resetLastMouseEvent();
+            app->axisCamera_.resetLastMouseEvent();
         }
     }
 
@@ -575,6 +583,17 @@ private:
        );
     }
 
+    void createAxisUniformBuffers() {
+       buffer::createUniformBuffers(
+        physicalDevice_,
+        device_,
+        MAX_FRAMES_IN_FLIGHT,
+        axisUniformBuffers_,
+        axisUniformBuffersMemory_,
+        axisUniformBuffersMapped_
+       );
+    }
+
     void createCommandBuffers() {
         commandBuffers_.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -744,6 +763,20 @@ private:
         ubo.proj = projectionMatrix_;
 
         ubo.view = camera_.getUpdatedViewMatrix();
+
+        // all transformations defined, we can copy
+        // no staging buffer, and memory already mapped
+        // it is not the most optimal way of doing (see push constants)
+        memcpy(uniformBuffersMapped_[currentImage], &ubo, sizeof(ubo));
+    }
+
+    void updateAxisUniformBuffer(uint32_t currentImage) {
+        buffer::UniformBufferObject ubo{};
+
+        ubo.model = modelMatrix_;
+        ubo.proj = projectionMatrix_;
+
+        ubo.view = axisCamera_.getUpdatedViewMatrix();
 
         // all transformations defined, we can copy
         // no staging buffer, and memory already mapped
@@ -1014,6 +1047,7 @@ private:
         createVertexBuffer();
         createIndexBuffer();
         createUniformBuffers();
+        createAxisUniformBuffers();
         createDescriptorPool();
         createCommandBuffers();
         createSyncObjects();
@@ -1080,7 +1114,9 @@ private:
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroyBuffer(device_, uniformBuffers_[i], nullptr);
+            vkDestroyBuffer(device_, axisUniformBuffers_[i], nullptr);
             vkFreeMemory(device_, uniformBuffersMemory_[i], nullptr);
+            vkFreeMemory(device_, axisUniformBuffersMemory_[i], nullptr);
         }
 
         // this will destroy the pool and its descriptor sets
