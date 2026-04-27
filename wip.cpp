@@ -188,7 +188,13 @@ private:
     std::vector<void*> uniformBuffersMapped_;
     std::vector<void*> axisUniformBuffersMapped_;
     VkDescriptorPool descriptorPool_;
-    VkDescriptorPool aixsDescriptorPool_;
+    // I was not able to create two ds on the same pool
+    /**
+    * This pool only has 0 descriptorSets remaining. The Vulkan spec states: 
+    * If the VK_KHR_maintenance1 extension is not enabled and VkPhysicalDeviceProperties::apiVersion is less than Vulkan 1.1,
+    * descriptorSetCount must not be greater than the number of sets that are currently available for allocation in descriptorPool
+    */
+    VkDescriptorPool axisDescriptorPool_;
     std::vector<VkDescriptorSet> descriptorSets_;
     std::vector<VkDescriptorSet> axisDescriptorSets_;
     Camera camera_;
@@ -708,6 +714,17 @@ private:
             0
         );
 
+        vkCmdBindDescriptorSets(
+            commandBuffer,
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            pipelineLayout_,
+            0,
+            1,
+            &axisDescriptorSets_[currentFrame_],
+            0,
+            nullptr
+        );
+
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cubePipeline_);
 
         // Not needed it seem, the dynamic state could be for all the command buffer ?
@@ -781,7 +798,7 @@ private:
         // all transformations defined, we can copy
         // no staging buffer, and memory already mapped
         // it is not the most optimal way of doing (see push constants)
-        memcpy(uniformBuffersMapped_[currentImage], &ubo, sizeof(ubo));
+        memcpy(axisUniformBuffersMapped_[currentImage], &ubo, sizeof(ubo));
     }
 
     void drawFrame() {
@@ -825,6 +842,7 @@ private:
         recordCommandBuffer(commandBuffers_[currentFrame_], imageIndex);
 
         updateUniformBuffer(currentFrame_);
+        updateAxisUniformBuffer(currentFrame_);
 
         // submitting the command buffer
         VkSubmitInfo submitInfo{};
@@ -885,6 +903,14 @@ private:
         );
     }
 
+    void createAxisDescriptorPool() {
+        buffer::createDescriptorPool(
+            device_,
+            MAX_FRAMES_IN_FLIGHT,
+            axisDescriptorPool_
+        );
+    }
+
     void createDescriptorSets() {
         buffer::createDescriptorSets(
             device_,
@@ -895,6 +921,19 @@ private:
             textureImageView_,
             textureSampler_,
             descriptorSets_
+        );
+    }
+
+    void createAxisDescriptorSets() {
+        buffer::createDescriptorSets(
+            device_,
+            MAX_FRAMES_IN_FLIGHT,
+            axisUniformBuffers_,
+            axisDescriptorPool_,
+            descriptorSetLayout_,
+            textureImageView_,
+            textureSampler_,
+            axisDescriptorSets_
         );
     }
 
@@ -1049,12 +1088,14 @@ private:
         createUniformBuffers();
         createAxisUniformBuffers();
         createDescriptorPool();
+        createAxisDescriptorPool();
         createCommandBuffers();
         createSyncObjects();
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
         createDescriptorSets();
+        createAxisDescriptorSets();
     }
 
     void mainLoop() {
@@ -1121,6 +1162,7 @@ private:
 
         // this will destroy the pool and its descriptor sets
         vkDestroyDescriptorPool(device_, descriptorPool_, nullptr);
+        vkDestroyDescriptorPool(device_, axisDescriptorPool_, nullptr);
 
         vkDestroyDescriptorSetLayout(device_, descriptorSetLayout_, nullptr);
 

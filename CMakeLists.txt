@@ -10,7 +10,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # I think it forces build type so cmake -dCMAKE_BUILD_TYPE won't work,
 # please change here if you want Debug
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 # Find required packages
 find_package(glfw3 REQUIRED)
