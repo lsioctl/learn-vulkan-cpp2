@@ -302,3 +302,15 @@ In Vulkan-Samples/framework/core/shader_module.cpp
 
 https://github.com/google/shaderc/blob/main/examples/online-compile/main.cc
 
+
+## Wireframe
+
+* Not followed the Nvidia paper (should be mainstream) (in geometry shader)
+
+https://developer.download.nvidia.com/SDK/10/direct3d/Source/SolidWireframe/Doc/SolidWireframe.pdf
+
+* inspired on this (WebGL) one:
+
+https://tchayen.github.io/posts/wireframes-with-barycentric-coordinates
+
+but with smoothstep

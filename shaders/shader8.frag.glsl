@@ -10,6 +10,24 @@ layout(binding = 1) uniform sampler2D texSampler;
 
 layout(location = 0) out vec4 outColor;
 
+float computeEdgeFactor(vec3 bCoords) {
+    float lineWidth = 0.5;
+    // for a "stretched" triangle we will have a "big" derivative for U, V, W in x, y
+    // for a "small" triangle a "small" derivative
+    vec3 derivative = fwidth(bCoords);
+
+    // we divide by the derivative to be able to compare proximity
+    // for differents "stretches" of the edges
+    float minU = bCoords.x / derivative.x;
+    float minV = bCoords.y / derivative.y;
+    float minW = bCoords.z / derivative.z;   
+
+    float minDistance = min(min(minU, minV), minW);
+
+    // use of smoothstep to limit aliasing
+    return smoothstep(lineWidth - 1, lineWidth + 1, minDistance);
+}
+
 void main() {
     // hardcoded for now
     vec3 lightPosition = vec3(5.0, 5.0, 0.0);
@@ -25,26 +43,7 @@ void main() {
     float diffuseComponent = max(dot(normal, lightDirection), 0.0);
     vec3 diffuse = diffuseComponent * lightColor;
 
-    bool fragOnEdge = false;
-    // Did not really understand this part
-    // I get why we need a derivative, but not how it is calculated
-    float lineWidth = 0.5; 
-    vec3 derivative = fwidth(inBarycentricCoordinate);
+    float edgeFactor = computeEdgeFactor(inBarycentricCoordinate);
 
-    if ((inBarycentricCoordinate.x < (derivative.x * lineWidth)) 
-        || (inBarycentricCoordinate.y < (derivative.y * lineWidth)) 
-        || (inBarycentricCoordinate.z < (derivative.z * lineWidth))) {
-        fragOnEdge = true;
-    }
-
-    // outColor = vec4((ambient + diffuse), 1.0) * texture(texSampler, fragTexCoord);
-    if (!fragOnEdge) {
-        outColor = vec4((ambient + diffuse), 1.0);
-    } else {
-        outColor = vec4(0.0, 0.0, 0.0, 1.0);
-    }
-    // outColor = vec4(1.0);
-    // outColor = vec4(normal, 1.0);
-    // outColor = vec4(inNormal, 1.0);
-    // outColor = vec4(fragPosition, 1.0);
+    outColor = vec4(edgeFactor * (ambient + diffuse), 1.0);
 }
