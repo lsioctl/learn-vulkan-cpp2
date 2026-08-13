@@ -34,6 +34,8 @@ public:
      * maybe it is a silly question
      * and anyway it would involve tricks with glfw window user pointer
      * ... but doable
+     * remark: maybe not as it is a callback, so by it self related
+     * to delta time ?
      * */
     void updateOrientation(double mouse_x_pos, double mouse_y_pos);
     // Update the LookAt with position, orientation, ... and return it

@@ -94,19 +94,14 @@ vec3 colors[36] = vec3[](
     vec3(1.0, 1.0, 0.0) // 3 top right front
 );
 
-// Scaling and translation
-// glm seems to use columns matrices
-mat4 modelMatrix = mat4(
-    0.2, 0.0, 0.0, 0.0, // col1
-    0.0, 0.2, 0.0, 0.0, // col2
-    0.0, 0.0, 0.2, 0.0, // col3
-    0.8, 0.8, 0.0, 1 // col4
-);
-
 void main() {
     // gl_Position = vec4(inPosition, 1.0);
     // fragColor = inColor;
     // The built-in gl_VertexIndex variable contains the index of the current vertex.
-    gl_Position = ubo.proj * ubo.view * modelMatrix * vec4(positions[gl_VertexIndex], 1.0);
+    // The scaling and the placement used to be hardcoded here, they now come from
+    // the uniform: ubo.model only scales the cube, and ubo.view holds the camera
+    // orientation followed by a fixed offset in view space, which is what keeps
+    // the cube at the same place on screen (see updateAxisUniformBuffer)
+    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(positions[gl_VertexIndex], 1.0);
     fragColor = colors[gl_VertexIndex];
 }

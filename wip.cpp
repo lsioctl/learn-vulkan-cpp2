@@ -70,6 +70,16 @@ const auto TEXTURE_PATH = "./models/viking_room.png";
 const auto CUBE_VERT_FILE = "./shaders/shader7.vert.glsl";
 const auto CUBE_FRAG_FILE = "./shaders/shader7.frag.glsl";
 
+/**
+ * The axis cube is a HUD gizmo: it shows the camera orientation but must not
+ * move on screen. So it is not placed in the world, but at a fixed point of the
+ * view space: x and y give its place on screen, z how far in front of the camera
+ * it sits (negative, as the camera looks toward -z).
+ * These values used to be hardcoded in shader7.vert.glsl.
+ */
+const glm::vec3 AXIS_GIZMO_VIEW_OFFSET = {0.8F, 0.8F, -3.0F};
+const float AXIS_GIZMO_SCALE = 0.2F;
+
 const std::vector<vertex::Vertex> vertices = {
     {
         {0.0F, -0.5F, 0.0F}, {1.0F, 0.0F, 0.0F}, {0.0F, 0.0F}
@@ -220,6 +230,8 @@ private:
     Model model_;
 
     glm::mat4 modelMatrix_;
+    /** scaling only, the axis cube is placed in view space, not in the world */
+    glm::mat4 axisModelMatrix_;
     glm::mat4 projectionMatrix_;
 
     void setScaling() {
@@ -790,10 +802,21 @@ private:
     void updateAxisUniformBuffer(uint32_t currentImage) {
         buffer::UniformBufferObject ubo{};
 
-        ubo.model = modelMatrix_;
+        ubo.model = axisModelMatrix_;
         ubo.proj = projectionMatrix_;
 
-        ubo.view = axisCamera_.getUpdatedViewMatrix();
+        /**
+         * The gizmo must show where the camera looks, without following where it
+         * stands: a view matrix is a rotation followed by a translation, so we
+         * drop the translation (4th column) and keep only the orientation.
+         * Then we put the cube back at a fixed point of the view space. The
+         * offset is applied after the rotation, which is what pins the cube on
+         * screen: the cube spins in place instead of orbiting around something.
+         */
+        glm::mat4 orientation = axisCamera_.getUpdatedViewMatrix();
+        orientation[3] = glm::vec4(0.0F, 0.0F, 0.0F, 1.0F);
+
+        ubo.view = glm::translate(glm::mat4(1.0F), AXIS_GIZMO_VIEW_OFFSET) * orientation;
 
         // all transformations defined, we can copy
         // no staging buffer, and memory already mapped
@@ -1038,6 +1061,14 @@ private:
     }
 
     /**
+     * Only a scaling: unlike the model, the axis cube is not placed in the
+     * world, it is placed in view space by updateAxisUniformBuffer
+     */
+    void initAxisModelMatrix() {
+        axisModelMatrix_ = glm::scale(glm::mat4(1.0F), glm::vec3(AXIS_GIZMO_SCALE));
+    }
+
+    /**
     * Must be called after swapChain creation
     * TODO: this becomes more and more messy for the state dependencies
     */
@@ -1073,6 +1104,7 @@ private:
         // TODO: this needs model loaded already
         setScaling();
         initModelMatrix();
+        initAxisModelMatrix();
         createSwapChain();
         initProjectionMatrix();
         createImageViews();

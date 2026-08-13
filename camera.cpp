@@ -9,10 +9,10 @@ Camera::Camera() :
     // y axis inversion compared to OpenGL (so glm)
     up_{glm::vec3(0.0f, 1.0f,  0.0f)},
     first_mouse_event_{false},
-    pitch_{0.},
     // camera points toward negative z-axis, so 90 clockwise
     // positive degrees rotate counter clockwise
     yaw_{-90.},
+    pitch_{0.},
     sensitivity_{0.1},
     // First mouse position (screen 800*600)
     // it is not really used (see mouse callback)
@@ -34,9 +34,9 @@ void Camera::updateOrientation(double mouse_x_pos, double mouse_y_pos)
         last_mouse_y_ = mouse_y_pos;
         first_mouse_event_ = false;
     }
-  
+
     float x_offset = mouse_x_pos - last_mouse_x_;
-    float y_offset = last_mouse_y_ - mouse_y_pos; 
+    float y_offset = last_mouse_y_ - mouse_y_pos;
     last_mouse_x_ = mouse_x_pos;
     last_mouse_y_ = mouse_y_pos;
 
@@ -54,6 +54,7 @@ void Camera::updateOrientation(double mouse_x_pos, double mouse_y_pos)
     if(pitch_ < -89.0f)
         pitch_ = -89.0f;
 
+    // the position does not move, only the direction we look at
     glm::vec3 direction;
     direction.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
     direction.y = sin(glm::radians(pitch_));
